@@ -1,0 +1,14 @@
+version: '2'
+
+services:
+  web:
+    build: .
+    links:
+      - postgres
+    ports:
+     - 8000:8000
+    volumes:
+     - ".:/work"
+
+  postgres:
+    image: postgres:latest
