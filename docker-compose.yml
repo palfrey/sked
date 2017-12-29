@@ -9,6 +9,7 @@ services:
      - 8000:8000
     volumes:
      - ".:/work"
+    restart: on-failure
 
   postgres:
     image: postgres:latest
