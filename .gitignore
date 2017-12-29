@@ -1,0 +1,4 @@
+ENV/
+db.sqlite3
+requirements.txt
+.vscode/
