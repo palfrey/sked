@@ -6,6 +6,7 @@
   <a class="btn btn-primary" href="{{ auth_url }}">Login to Google</a>
   {% else %}
   <h3>Hi {{ user.name }}!</h3>
+  {{ calendars }}
   {% endif %}
  </div>
 </div>

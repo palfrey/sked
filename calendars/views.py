@@ -15,6 +15,10 @@ from .models import GoogleUser
 
 import requests
 
+scopes = ['https://www.googleapis.com/auth/userinfo.email',
+          'https://www.googleapis.com/auth/userinfo.profile',
+          'https://www.googleapis.com/auth/calendar.readonly']
+
 def make_flow(request):
     callback = request.build_absolute_uri(reverse('oauth2callback'))
     oauth_config = {'web': {
@@ -24,17 +28,30 @@ def make_flow(request):
                     "auth_uri": "https://accounts.google.com/o/oauth2/auth",
                     "token_uri": "https://accounts.google.com/o/oauth2/token"
                     }}
-    scopes = ['https://www.googleapis.com/auth/userinfo.email',
-            'https://www.googleapis.com/auth/userinfo.profile',
-            'https://www.googleapis.com/auth/calendar.readonly']
     return google_auth_oauthlib.flow.Flow.from_client_config(oauth_config,
             scopes=scopes, redirect_uri=callback)
+
+def make_credentials(user):
+    cred = {
+        'token': user.token,
+        'refresh_token': None,
+        'token_uri': "https://accounts.google.com/o/oauth2/token",
+        'client_id': settings.GOOGLE_OAUTH2_KEY,
+        'client_secret': settings.GOOGLE_OAUTH2_SECRET,
+        'scopes': scopes}
+    credentials = google.oauth2.credentials.Credentials(**cred)
+    return credentials
 
 def home(request):
     email = request.session.get("email", None)
     if email is not None:
         user = GoogleUser.objects.get(email=email)
         authorization_url = None
+        credentials = make_credentials(user)
+        calendar_service = build(
+            serviceName='calendar', version='v3',
+            credentials=credentials)
+        calendars = calendar_service.calendarList().list(minAccessRole="owner").execute()['items']
     else:
         flow = make_flow(request)
 
@@ -43,14 +60,8 @@ def home(request):
             include_granted_scopes='true')
         request.session['state'] = state
         user = None
-    #social = request.user.social_auth.get(provider='google-oauth2')
-    #resp = requests.get("https://www.googleapis.com/calendar/v3/users/me/calendarList?minAccessRole=owner", headers={"Authorization": "Bearer %s" % social.extra_data["access_token"]})
-    # credentials = oauth2client.client.AccessTokenCredentials(social.extra_data['access_token'],
-    #     'my-user-agent/1.0')
-    # http = httplib2.Http()
-    # http = credentials.authorize(http)
-    # resp = http.request('https://www.googleapis.com/calendar/v3/users/me/calendarList?minAccessRole=owner')
-    return render(request, 'home.html', {'user': user, 'auth_url': authorization_url})
+        calendars = []
+    return render(request, 'home.html', {'user': user, 'auth_url': authorization_url, 'calendars': calendars})
 
 def oauth2callback(request):
     state = request.session['state']
@@ -70,13 +81,6 @@ def oauth2callback(request):
     user.name = user_info['name']
     user.save()
     request.session['email'] = user.email
-    # cred = {
-    #     'token': credentials.token,
-    #     'refresh_token': credentials.refresh_token,
-    #     'token_uri': credentials.token_uri,
-    #     'client_id': credentials.client_id,
-    #     'client_secret': credentials.client_secret,
-    #     'scopes': credentials.scopes}
     return redirect(reverse('home'))
 
 
