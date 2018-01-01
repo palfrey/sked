@@ -102,7 +102,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/2.0/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'en-gb'
 
 TIME_ZONE = 'UTC'
 
@@ -117,4 +117,8 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-from .settings_private import *
+try:
+    from .settings_private import *
+except ModuleNotFoundError:
+    GOOGLE_OAUTH2_KEY = os.environ["GOOGLE_OAUTH2_KEY"]
+    GOOGLE_OAUTH2_SECRET = os.environ["GOOGLE_OAUTH2_SECRET"]
