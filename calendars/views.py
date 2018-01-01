@@ -51,8 +51,7 @@ def home(request):
         except GoogleUser.DoesNotExist:
             del request.session["email"]
             return redirect(reverse("home"))
-        calendars = list(user.calendars.all())
-        data = {"user": user, "calendars": calendars}
+        data = {"user": user, "g_calendars": list(user.g_calendars.all()), "i_calendars": list(user.i_calendars.all())}
     else:
         flow = make_flow(request)
 

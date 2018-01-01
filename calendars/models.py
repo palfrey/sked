@@ -10,6 +10,12 @@ class GoogleUser(models.Model):
 
 class GoogleCalendar(models.Model):
     id = models.CharField(primary_key=True, max_length=255)
-    user = models.ForeignKey(GoogleUser, on_delete=models.CASCADE, related_name='calendars')
+    user = models.ForeignKey(GoogleUser, on_delete=models.CASCADE, related_name='g_calendars')
     name = models.CharField(max_length=255)
     primary = models.BooleanField()
+
+class IcalCalendar(models.Model):
+    url = models.URLField(primary_key=True)
+    user = models.ForeignKey(GoogleUser, on_delete=models.CASCADE, related_name='i_calendars')
+    name = models.CharField(max_length=255)
+    last_retrieved_at = models.DateTimeField()
