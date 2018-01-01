@@ -6,4 +6,8 @@ google-auth
 google-auth-oauthlib
 google-auth-httplib2
 
+# Heroku
+gunicorn
+
+# Managing this file
 pip-tools

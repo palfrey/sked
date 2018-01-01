@@ -1,0 +1,1 @@
+web: gunicorn sked.wsgi --log-file -
