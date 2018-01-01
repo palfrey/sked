@@ -8,9 +8,20 @@ from django.db import transaction
 from .models import Profile
 from .forms import UserForm,ProfileForm
 
+import oauth2client.client
+import httplib2
+import requests
+
 @login_required
 def Home(request):
-    return render(request, 'home.html')
+    social = request.user.social_auth.get(provider='google-oauth2')
+    resp = requests.get("https://www.googleapis.com/calendar/v3/users/me/calendarList?minAccessRole=owner", headers={"Authorization": "Bearer %s" % social.extra_data["access_token"]})
+    # credentials = oauth2client.client.AccessTokenCredentials(social.extra_data['access_token'],
+    #     'my-user-agent/1.0')
+    # http = httplib2.Http()
+    # http = credentials.authorize(http)
+    # resp = http.request('https://www.googleapis.com/calendar/v3/users/me/calendarList?minAccessRole=owner')
+    return render(request, 'home.html', {'data': social.extra_data})
 
 @login_required
 @transaction.atomic

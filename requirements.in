@@ -2,5 +2,6 @@ django >= 2.0
 social-auth-app-django >= 2.1.0
 dj-database-url
 psycopg2
+google-api-python-client
 
 pip-tools
