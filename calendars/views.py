@@ -7,11 +7,12 @@ from django.http import HttpResponseRedirect, HttpRequest
 from django.db import transaction
 from django.conf import settings
 from django.urls import reverse
+import datetime
 
 import google.oauth2.credentials
 import google_auth_oauthlib.flow
 from apiclient.discovery import build
-from .models import GoogleUser
+from .models import *
 
 import requests
 
@@ -34,7 +35,7 @@ def make_flow(request):
 def make_credentials(user):
     cred = {
         'token': user.token,
-        'refresh_token': None,
+        'refresh_token': user.refresh_token,
         'token_uri': "https://accounts.google.com/o/oauth2/token",
         'client_id': settings.GOOGLE_OAUTH2_KEY,
         'client_secret': settings.GOOGLE_OAUTH2_SECRET,
@@ -45,23 +46,23 @@ def make_credentials(user):
 def home(request):
     email = request.session.get("email", None)
     if email is not None:
-        user = GoogleUser.objects.get(email=email)
-        authorization_url = None
-        credentials = make_credentials(user)
-        calendar_service = build(
-            serviceName='calendar', version='v3',
-            credentials=credentials)
-        calendars = calendar_service.calendarList().list(minAccessRole="owner").execute()['items']
+        try:
+            user = GoogleUser.objects.get(email=email)
+        except GoogleUser.DoesNotExist:
+            del request.session["email"]
+            return redirect(reverse("home"))
+        calendars = list(user.calendars.all())
+        data = {"user": user, "calendars": calendars}
     else:
         flow = make_flow(request)
 
         authorization_url, state = flow.authorization_url(
             access_type='offline',
-            include_granted_scopes='true')
+            include_granted_scopes='true',
+            prompt='consent')
         request.session['state'] = state
-        user = None
-        calendars = []
-    return render(request, 'home.html', {'user': user, 'auth_url': authorization_url, 'calendars': calendars})
+        data = {'user': None, 'auth_url': authorization_url}
+    return render(request, 'home.html', data)
 
 def oauth2callback(request):
     state = request.session['state']
@@ -76,11 +77,22 @@ def oauth2callback(request):
         credentials=credentials)
     user_info = user_info_service.userinfo().get().execute()
 
-    user, _ = GoogleUser.objects.get_or_create(email=user_info['email'])
+    user, created = GoogleUser.objects.get_or_create(email=user_info['email'])
     user.token = credentials.token
+    user.refresh_token = credentials.refresh_token
     user.name = user_info['name']
     user.save()
     request.session['email'] = user.email
+    if created:
+        calendar_service = build(
+            serviceName='calendar', version='v3',
+            credentials=credentials)
+        calendars = calendar_service.calendarList().list(minAccessRole="owner").execute()['items']
+        for calendar in calendars:
+            cal, created = GoogleCalendar.objects.get_or_create(id=calendar['id'], user=user, name=calendar['summary'], primary=calendar.get('primary', False))
+            cal.save()
+        user.calendars_retrieved_at = datetime.datetime.now()
+        user.save()
     return redirect(reverse('home'))
 
 
