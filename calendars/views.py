@@ -1,20 +1,18 @@
-from django.shortcuts import render, get_object_or_404, redirect
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
+from django.shortcuts import render, redirect
 from django.contrib.auth import logout
-from django.http import HttpResponseRedirect, HttpRequest
-from django.db import transaction
 from django.conf import settings
 from django.urls import reverse
-import datetime
+from django.contrib import messages
 
 import google.oauth2.credentials
 import google_auth_oauthlib.flow
 from apiclient.discovery import build
 from .models import *
+from .forms import NewCalendarForm
 
 import requests
+import icalendar
+import datetime
 
 scopes = ['https://www.googleapis.com/auth/userinfo.email',
           'https://www.googleapis.com/auth/userinfo.profile',
@@ -43,14 +41,27 @@ def make_credentials(user):
     credentials = google.oauth2.credentials.Credentials(**cred)
     return credentials
 
-def home(request):
+class Redirect(Exception):
+    def __init__(self, url):
+        self.url = url
+
+def get_user(request):
     email = request.session.get("email", None)
     if email is not None:
         try:
-            user = GoogleUser.objects.get(email=email)
+            return GoogleUser.objects.get(email=email)
         except GoogleUser.DoesNotExist:
             del request.session["email"]
-            return redirect(reverse("home"))
+            raise Redirect(reverse("home"))
+    else:
+        return None
+
+def home(request):
+    try:
+        user = get_user(request)
+    except Redirect as r:
+        return redirect(r.url)
+    if user:
         data = {"user": user, "g_calendars": list(user.g_calendars.all()), "i_calendars": list(user.i_calendars.all())}
     else:
         flow = make_flow(request)
@@ -95,7 +106,34 @@ def oauth2callback(request):
     return redirect(reverse('home'))
 
 
+def add_calendar(request):
+    try:
+        user = get_user(request)
+    except Redirect as r:
+        return redirect(r.url)
+    if user == None:
+        return redirect(reverse('home'))
+    if request.method == 'POST':
+        form = NewCalendarForm(request.POST)
+        if form.is_valid():
+            url = form.cleaned_data['calendar_url']
+            cal = requests.get(url)
+            if cal.status_code == 200:
+                parsed = icalendar.Calendar.from_ical(cal.text)
+                new_cal, _ = IcalCalendar.objects.get_or_create(url=url, user=user)
+                new_cal.name = parsed.get('X-WR-CALNAME', "")
+                new_cal.last_retrieved_at = datetime.datetime.now()
+                new_cal.save()
+                messages.success(request, 'Calendar added')
+                return redirect(reverse('home'))
+            else:
+                form.add_error("calendar_url", "Bad response from %s: %s - %s" % (url, cal.status_code, cal.reason))
+    else:
+        form = NewCalendarForm()
+    return render(request, "new_calendar.html", {"form": form})
+
+
 def logout(request):
     raise Exception
     #logout(request)
-    return HttpResponseRedirect('/')
+    return redirect('/')

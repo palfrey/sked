@@ -17,6 +17,7 @@ google-auth-oauthlib==0.2.0
 google-auth==1.2.1
 gunicorn==19.7.1
 httplib2==0.10.3          # via google-api-python-client, google-auth-httplib2, oauth2client
+icalendar==4.0.0
 idna==2.6                 # via requests
 oauth2client==4.1.2       # via google-api-python-client
 oauthlib==2.0.6           # via requests-oauthlib
@@ -24,10 +25,11 @@ pip-tools==1.11.0
 psycopg2==2.7.3.2
 pyasn1-modules==0.2.1     # via google-auth, oauth2client
 pyasn1==0.4.2             # via google-auth, oauth2client, pyasn1-modules, rsa
-pytz==2017.3              # via django
+python-dateutil==2.6.1    # via icalendar
+pytz==2017.3              # via django, icalendar
 requests-oauthlib==0.8.0  # via google-auth-oauthlib
-requests==2.18.4          # via requests-oauthlib
+requests==2.18.4
 rsa==3.4.2                # via google-auth, oauth2client
-six==1.11.0               # via google-api-python-client, google-auth, oauth2client, pip-tools
+six==1.11.0               # via google-api-python-client, google-auth, oauth2client, pip-tools, python-dateutil
 uritemplate==3.0.0        # via google-api-python-client
 urllib3==1.22             # via requests
