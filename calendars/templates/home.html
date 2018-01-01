@@ -6,7 +6,20 @@
   <a class="btn btn-primary" href="{{ auth_url }}">Login to Google</a>
   {% else %}
   <h3>Hi {{ user.name }}!</h3>
-  {{ calendars }}
+  <table class="table table-bordered table-hover">
+    <thead>
+      <tr>
+        <th><a href="">Add new shared calendar</a></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for cal in calendars %}
+      <tr>
+        <td>Google: {{ cal.name }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+    </table>
   {% endif %}
  </div>
 </div>
