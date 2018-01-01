@@ -121,7 +121,7 @@ def add_calendar(request):
             if cal.status_code == 200:
                 try:
                     parsed = icalendar.Calendar.from_ical(cal.text)
-                    new_cal, _ = IcalCalendar.objects.get_or_create(url=url, user=user)
+                    new_cal, _ = IcalCalendar.objects.get_or_create(url=url, user=user, defaults={'last_retrieved_at': datetime.datetime.now()})
                     new_cal.name = parsed.get('X-WR-CALNAME', "")
                     new_cal.last_retrieved_at = datetime.datetime.now()
                     new_cal.save()
