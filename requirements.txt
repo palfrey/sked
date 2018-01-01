@@ -4,30 +4,29 @@
 #
 #    pip-compile --output-file requirements.txt requirements.in
 #
+cachetools==2.0.1         # via google-auth
 certifi==2017.11.5        # via requests
 chardet==3.0.4            # via requests
 click==6.7                # via pip-tools
-defusedxml==0.5.0         # via python3-openid, social-auth-core
 dj-database-url==0.4.2
 django==2.0
 first==2.0.1              # via pip-tools
 google-api-python-client==1.6.4
-httplib2==0.10.3          # via google-api-python-client, oauth2client
+google-auth-httplib2==0.0.3
+google-auth-oauthlib==0.2.0
+google-auth==1.2.1
+httplib2==0.10.3          # via google-api-python-client, google-auth-httplib2, oauth2client
 idna==2.6                 # via requests
 oauth2client==4.1.2       # via google-api-python-client
-oauthlib==2.0.6           # via requests-oauthlib, social-auth-core
+oauthlib==2.0.6           # via requests-oauthlib
 pip-tools==1.11.0
 psycopg2==2.7.3.2
-pyasn1-modules==0.2.1     # via oauth2client
-pyasn1==0.4.2             # via oauth2client, pyasn1-modules, rsa
-pyjwt==1.5.3              # via social-auth-core
-python3-openid==3.1.0     # via social-auth-core
+pyasn1-modules==0.2.1     # via google-auth, oauth2client
+pyasn1==0.4.2             # via google-auth, oauth2client, pyasn1-modules, rsa
 pytz==2017.3              # via django
-requests-oauthlib==0.8.0  # via social-auth-core
-requests==2.18.4          # via requests-oauthlib, social-auth-core
-rsa==3.4.2                # via oauth2client
-six==1.11.0               # via google-api-python-client, oauth2client, pip-tools, social-auth-app-django, social-auth-core
-social-auth-app-django==2.1.0
-social-auth-core==1.6.0   # via social-auth-app-django
+requests-oauthlib==0.8.0  # via google-auth-oauthlib
+requests==2.18.4          # via requests-oauthlib
+rsa==3.4.2                # via google-auth, oauth2client
+six==1.11.0               # via google-api-python-client, google-auth, oauth2client, pip-tools
 uritemplate==3.0.0        # via google-api-python-client
 urllib3==1.22             # via requests

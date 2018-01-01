@@ -19,7 +19,5 @@ from django.conf.urls import include, url
 
 urlpatterns = [
     path('', include('calendars.urls')),
-    url(r'^account/', include('social_django.urls', namespace='social')),
-    url(r'^account/', include('django.contrib.auth.urls')),
     path('admin/', admin.site.urls),
 ]

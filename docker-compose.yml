@@ -10,6 +10,8 @@ services:
     volumes:
      - ".:/work"
     restart: on-failure
+    environment:
+      - OAUTHLIB_INSECURE_TRANSPORT=1
 
   postgres:
     image: postgres:latest
