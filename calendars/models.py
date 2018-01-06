@@ -23,3 +23,6 @@ class IcalCalendar(models.Model):
 class MergedCalendar(models.Model):
     name = models.CharField(max_length=255)
     user = models.ForeignKey(GoogleUser, on_delete=models.CASCADE, related_name='m_calendars')
+
+    def __str__(self):
+        return '%s for %s' % (self.name, self.user.name)
