@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load calendar_tags %}
 {% block content %}
 <div class="row">
  <div class="col s12 m6 offset-m3">
@@ -18,16 +19,16 @@
       {% for cal in g_calendars %}
       <tr>
         <td>Google: {{ cal.name }}</td>
-        {% for cal in m_calendars %}
-        <th><i class="material-icons no-access">indeterminate_check_box</i></th>
+        {% for m_cal in m_calendars %}
+        <td>{% access cal m_cal %}</td>
         {% endfor %}
       </tr>
       {% endfor %}
       {% for cal in i_calendars %}
       <tr>
         <td>{{ cal.name }}</td>
-        {% for cal in m_calendars %}
-        <th><i class="material-icons no-access">indeterminate_check_box</i></th>
+        {% for m_cal in m_calendars %}
+        <td>{% access cal m_cal %}</td>
         {% endfor %}
       </tr>
       {% endfor %}
