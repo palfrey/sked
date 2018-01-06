@@ -5,5 +5,6 @@ urlpatterns = [
     url(r'^$', views.home, name='home'),
     url(r'^oauth2callback$', views.oauth2callback, name='oauth2callback'),
     url(r'^add_calendar$', views.add_calendar, name='add_calendar'),
+    url(r'^add_merged_calendar$', views.add_merged_calendar, name='add_merged_calendar'),
     url(r'^account/logout/$', views.logout),
 ]

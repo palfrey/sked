@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row">
+ <div class="col s12 m6 offset-m3">
+    <form action="{% url 'add_merged_calendar' %}" method="post">
+        {% csrf_token %}
+        {{ form }}
+        <input class="form-control" type="submit" value="Submit" />
+    </form>
+ </div>
+</div>
+{% endblock %}

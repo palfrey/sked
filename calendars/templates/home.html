@@ -6,23 +6,31 @@
   <a class="btn btn-primary" href="{{ auth_url }}">Login to Google</a>
   {% else %}
   <h3>Hi {{ user.name }}!</h3>
-  <a class="btn btn-primary" href="">Add new shared calendar</a><br />
+  <a class="btn btn-primary" href="{% url 'add_merged_calendar' %}">Add new merged calendar</a><br />
   <br />
   <table class="table table-bordered table-hover">
-    <!-- <thead>
+    <thead>
       <tr>
-        <th></th>
+        <th>&nbsp;</th>
+        {% for cal in m_calendars %}
+        <th>{{ cal.name }}</th>
+        {% endfor %}
       </tr>
-    </thead> -->
     <tbody>
       {% for cal in g_calendars %}
       <tr>
         <td>Google: {{ cal.name }}</td>
+        {% for cal in m_calendars %}
+        <th><i class="material-icons no-access">indeterminate_check_box</i></th>
+        {% endfor %}
       </tr>
       {% endfor %}
       {% for cal in i_calendars %}
       <tr>
         <td>{{ cal.name }}</td>
+        {% for cal in m_calendars %}
+        <th><i class="material-icons no-access">indeterminate_check_box</i></th>
+        {% endfor %}
       </tr>
       {% endfor %}
     </tbody>

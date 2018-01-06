@@ -8,7 +8,7 @@ import google.oauth2.credentials
 import google_auth_oauthlib.flow
 from apiclient.discovery import build
 from .models import *
-from .forms import NewCalendarForm
+from .forms import *
 
 import requests
 import icalendar
@@ -62,7 +62,10 @@ def home(request):
     except Redirect as r:
         return redirect(r.url)
     if user:
-        data = {"user": user, "g_calendars": list(user.g_calendars.all()), "i_calendars": list(user.i_calendars.all())}
+        data = {"user": user,
+                "g_calendars": list(user.g_calendars.all()),
+                "i_calendars": list(user.i_calendars.all()),
+                "m_calendars": list(user.m_calendars.all())}
     else:
         flow = make_flow(request)
 
@@ -134,6 +137,28 @@ def add_calendar(request):
     else:
         form = NewCalendarForm()
     return render(request, "new_calendar.html", {"form": form})
+
+def add_merged_calendar(request):
+    try:
+        user = get_user(request)
+    except Redirect as r:
+        return redirect(r.url)
+    if user == None:
+        return redirect(reverse('home'))
+    if request.method == 'POST':
+        form = NewMergedCalendarForm(request.POST)
+        if form.is_valid():
+            name = form.cleaned_data['name']
+            if MergedCalendar.objects.filter(name=name, user=user).exists():
+                form.add_error("name", "Calendar called '%s' already exists" % name)
+            else:
+                m = MergedCalendar(name=name, user=user)
+                m.save()
+                messages.success(request, "Merged calendar added for '%s'" % name)
+                return redirect(reverse('home'))
+    else:
+        form = NewMergedCalendarForm()
+    return render(request, "new_merged_calendar.html", {"form": form})
 
 
 def logout(request):

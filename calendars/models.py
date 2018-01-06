@@ -19,3 +19,7 @@ class IcalCalendar(models.Model):
     user = models.ForeignKey(GoogleUser, on_delete=models.CASCADE, related_name='i_calendars')
     name = models.CharField(max_length=255)
     last_retrieved_at = models.DateTimeField()
+
+class MergedCalendar(models.Model):
+    name = models.CharField(max_length=255)
+    user = models.ForeignKey(GoogleUser, on_delete=models.CASCADE, related_name='m_calendars')
