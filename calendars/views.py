@@ -77,6 +77,21 @@ def home(request):
         data = {'user': None, 'auth_url': authorization_url}
     return render(request, 'home.html', data)
 
+def update_access(request):
+    try:
+        user = get_user(request)
+    except Redirect as r:
+        return redirect(r.url)
+    if user == None or request.method != 'POST':
+        return redirect(reverse('home'))
+    for mc in user.m_calendars.all():
+        for ac in mc.access.all():
+            if str(ac.id) in request.POST:
+                ac.access_level = request.POST[str(ac.id)]
+                ac.save()
+    messages.success(request, 'Permissions updated')
+    return redirect(reverse('home'))
+
 def oauth2callback(request):
     state = request.session['state']
     flow = make_flow(request)

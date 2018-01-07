@@ -1,5 +1,5 @@
-<select>
-    <option {% if chosen == 'yes' %}selected{% endif %}>Yes</option>
-    <option {% if chosen == 'busy' %}selected{% endif %}>Busy</option>
-    <option {% if chosen == 'no' %}selected{% endif %}>No</option>
+<select name="{{ id }}">
+    <option{% if chosen == 'yes' %} selected{% endif %} value="yes">Yes</option>
+    <option{% if chosen == 'busy' %} selected{% endif %} value="busy">Busy</option>
+    <option{% if chosen == 'no' %} selected{% endif %} value="no">No</option>
 </select>

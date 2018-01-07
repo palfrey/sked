@@ -7,34 +7,38 @@
   <a class="btn btn-primary" href="{{ auth_url }}">Login to Google</a>
   {% else %}
   <h3>Hi {{ user.name }}!</h3>
-  <table class="table table-bordered table-hover">
-    <thead>
-      <tr>
-        <th><a class="btn btn-primary" href="{% url 'add_merged_calendar' %}">Add new merged calendar</a></th>
-        {% for cal in m_calendars %}
-        <th>{{ cal.name }}</th>
+  <form action="{% url 'update_access' %}" method="post">
+    {% csrf_token %}
+    <table class="table table-bordered table-hover">
+      <thead>
+        <tr>
+          <th><a class="btn btn-primary" href="{% url 'add_merged_calendar' %}">Add new merged calendar</a></th>
+          {% for cal in m_calendars %}
+          <th>{{ cal.name }}</th>
+          {% endfor %}
+        </tr>
+      <tbody>
+        {% for cal in g_calendars %}
+        <tr>
+          <td>Google: {{ cal.name }}</td>
+          {% for m_cal in m_calendars %}
+          <td>{% access cal m_cal %}</td>
+          {% endfor %}
+        </tr>
         {% endfor %}
-      </tr>
-    <tbody>
-      {% for cal in g_calendars %}
-      <tr>
-        <td>Google: {{ cal.name }}</td>
-        {% for m_cal in m_calendars %}
-        <td>{% access cal m_cal %}</td>
+        {% for cal in i_calendars %}
+        <tr>
+          <td>{{ cal.name }}</td>
+          {% for m_cal in m_calendars %}
+          <td>{% access cal m_cal %}</td>
+          {% endfor %}
+        </tr>
         {% endfor %}
-      </tr>
-      {% endfor %}
-      {% for cal in i_calendars %}
-      <tr>
-        <td>{{ cal.name }}</td>
-        {% for m_cal in m_calendars %}
-        <td>{% access cal m_cal %}</td>
-        {% endfor %}
-      </tr>
-      {% endfor %}
-    </tbody>
+        <tr><td colspan="{{ m_calendars|length|add:'1' }}"><input class="btn-success form-control" type="submit" value="Save changes" /></td></tr>
+      </tbody>
     </table>
-    <a class="btn btn-primary" href="{% url 'add_calendar' %}">Add new iCal calendar</a><br />
+  </form>
+  <a class="btn btn-primary" href="{% url 'add_calendar' %}">Add new iCal calendar</a><br />
   {% endif %}
  </div>
 </div>

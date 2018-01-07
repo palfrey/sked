@@ -40,7 +40,15 @@ class MergedCalendar(models.Model):
         for ac in entries:
             if ac.mergedCalendar == self:
                 return ac
-        return CalendarAccess(access_level=NO_ACCESS)
+        ac = CalendarAccess(access_level=NO_ACCESS, mergedCalendar=self)
+        if type(calendar) == GoogleCalendar:
+            ac.g_calendar = calendar
+        elif type(calendar) == IcalCalendar:
+            ac.i_calendar = calendar
+        else:
+            raise Exception(type(calendar))
+        ac.save()
+        return ac
 
 class CalendarAccess(models.Model):
     mergedCalendar = models.ForeignKey(MergedCalendar, on_delete=models.CASCADE, related_name='access')
