@@ -13,6 +13,7 @@ from .forms import *
 import requests
 import icalendar
 import datetime
+from functools import wraps
 
 scopes = ['https://www.googleapis.com/auth/userinfo.email',
           'https://www.googleapis.com/auth/userinfo.profile',
@@ -56,6 +57,19 @@ def get_user(request):
     else:
         return None
 
+def needs_login(view_func):
+    def _decorator(request, *args, **kwargs):
+        try:
+            user = get_user(request)
+        except Redirect as r:
+            return redirect(r.url)
+        if user == None:
+            return redirect(reverse('home'))
+        kwargs['user'] = user
+        response = view_func(request, *args, **kwargs)
+        return response
+    return wraps(view_func)(_decorator)
+
 def home(request):
     try:
         user = get_user(request)
@@ -77,13 +91,8 @@ def home(request):
         data = {'user': None, 'auth_url': authorization_url}
     return render(request, 'home.html', data)
 
-def update_access(request):
-    try:
-        user = get_user(request)
-    except Redirect as r:
-        return redirect(r.url)
-    if user == None or request.method != 'POST':
-        return redirect(reverse('home'))
+@needs_login
+def update_access(request, user=None):
     for mc in user.m_calendars.all():
         for ac in mc.access.all():
             if str(ac.id) in request.POST:
@@ -123,14 +132,8 @@ def oauth2callback(request):
         user.save()
     return redirect(reverse('home'))
 
-
-def add_calendar(request):
-    try:
-        user = get_user(request)
-    except Redirect as r:
-        return redirect(r.url)
-    if user == None:
-        return redirect(reverse('home'))
+@needs_login
+def add_calendar(request, user=None):
     if request.method == 'POST':
         form = NewCalendarForm(request.POST)
         if form.is_valid():
@@ -153,13 +156,8 @@ def add_calendar(request):
         form = NewCalendarForm()
     return render(request, "new_calendar.html", {"form": form})
 
-def add_merged_calendar(request):
-    try:
-        user = get_user(request)
-    except Redirect as r:
-        return redirect(r.url)
-    if user == None:
-        return redirect(reverse('home'))
+@needs_login
+def add_merged_calendar(request, user=None):
     if request.method == 'POST':
         form = NewMergedCalendarForm(request.POST)
         if form.is_valid():
@@ -175,7 +173,8 @@ def add_merged_calendar(request):
         form = NewMergedCalendarForm()
     return render(request, "new_merged_calendar.html", {"form": form})
 
-def merged_calendar(request, id):
+@needs_login
+def merged_calendar(request, id, user=None):
     raise Exception
 
 
