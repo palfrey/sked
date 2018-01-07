@@ -9,5 +9,5 @@ urlpatterns = [
     path('calendar/<uuid:id>/edit', views.merged_calendar, name='merged_calendar'),
     path('calendar/<uuid:id>', views.merged_calendar_view, name='merged_calendar_view'),
     path('update_access', views.update_access, name='update_access'),
-    path('account/logout/', views.logout),
+    path('account/logout/', views.logout, name='logout'),
 ]

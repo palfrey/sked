@@ -7,6 +7,7 @@
   <a class="btn btn-primary" href="{{ auth_url }}">Login to Google</a>
   {% else %}
   <h3>Hi {{ user.name }}!</h3>
+  <a href="{% url 'logout' %}" class="btn btn-danger">Logout</a>
   <form action="{% url 'update_access' %}" method="post">
     {% csrf_token %}
     <table class="table table-bordered table-hover">

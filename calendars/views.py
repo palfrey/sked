@@ -196,6 +196,5 @@ def merged_calendar_view(request, id):
 
 
 def logout(request):
-    raise Exception
-    #logout(request)
-    return redirect('/')
+    del request.session["email"]
+    return redirect(reverse('home'))
