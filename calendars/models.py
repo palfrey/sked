@@ -14,11 +14,17 @@ class GoogleCalendar(models.Model):
     name = models.CharField(max_length=255)
     primary = models.BooleanField()
 
+    def __str__(self):
+        return self.name
+
 class IcalCalendar(models.Model):
     url = models.URLField(primary_key=True)
     user = models.ForeignKey(GoogleUser, on_delete=models.CASCADE, related_name='i_calendars')
     name = models.CharField(max_length=255)
     last_retrieved_at = models.DateTimeField()
+
+    def __str__(self):
+        return self.name
 
 NO_ACCESS = 'no'
 
@@ -52,4 +58,4 @@ class CalendarAccess(models.Model):
 
     def __str__(self):
         cal = self.i_calendar if self.g_calendar == None else self.g_calendar
-        return "Access is %s to %s for %s" % (self.access_level, cal, self.mergedCalendar)
+        return "Access is '%s' to '%s' for %s" % (self.access_level, cal, self.mergedCalendar)
