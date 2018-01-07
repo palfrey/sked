@@ -4,6 +4,8 @@ from django.conf import settings
 from django.urls import reverse
 from django.contrib import messages
 from django.views.decorators.http import require_POST
+from django.core.cache import cache
+from django.http import HttpResponse
 
 import google.oauth2.credentials
 import google_auth_oauthlib.flow
@@ -193,7 +195,31 @@ def merged_calendar(request, id, user=None):
     return render(request, "merged_calendar.html", {"mc": mc, "form": form, "url": request.build_absolute_uri(reverse("merged_calendar_view", args=[mc.id]))})
 
 def merged_calendar_view(request, id):
-    raise Exception
+    mc = MergedCalendar.objects.get(id=id)
+    main_cal = icalendar.Calendar()
+    main_cal.add('prodid', '-//Sked//')
+    main_cal.add('version', '2.0')
+    main_cal.add('X-WR-CALNAME', mc.user.name)
+
+    for ac in mc.access.all():
+        if ac.access_level != 'yes':
+            continue
+        if ac.g_calendar != None:
+            raise Exception(ac.g_calendar)
+        elif ac.i_calendar != None:
+            url = ac.i_calendar.url
+            ical = cache.get(url)
+            if ical == None:
+                data = requests.get(url)
+                data.raise_for_status()
+                ical = data.text
+                cache.set(url, ical)
+            cal = icalendar.Calendar.from_ical(ical)
+            for comp in cal.subcomponents:
+                main_cal.add_component(comp)
+        else:
+            raise Exception(ac)
+    return HttpResponse(main_cal.to_ical())
 
 @needs_login
 @require_POST
