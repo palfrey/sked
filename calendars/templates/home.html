@@ -14,7 +14,7 @@
         <tr>
           <th><a class="btn btn-primary" href="{% url 'add_merged_calendar' %}">Add new merged calendar</a></th>
           {% for cal in m_calendars %}
-          <th>{{ cal.name }}</th>
+          <th><a href="{% url 'merged_calendar' cal.id %}">{{ cal.name }}</a></th>
           {% endfor %}
         </tr>
       <tbody>

@@ -175,6 +175,9 @@ def add_merged_calendar(request):
         form = NewMergedCalendarForm()
     return render(request, "new_merged_calendar.html", {"form": form})
 
+def merged_calendar(request, id):
+    raise Exception
+
 
 def logout(request):
     raise Exception

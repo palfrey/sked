@@ -1,5 +1,6 @@
 from django.db import models
 import datetime
+import uuid
 
 class GoogleUser(models.Model):
     email = models.EmailField(primary_key=True)
@@ -29,6 +30,7 @@ class IcalCalendar(models.Model):
 NO_ACCESS = 'no'
 
 class MergedCalendar(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=255)
     user = models.ForeignKey(GoogleUser, on_delete=models.CASCADE, related_name='m_calendars')
 
