@@ -3,6 +3,7 @@ from django.contrib.auth import logout
 from django.conf import settings
 from django.urls import reverse
 from django.contrib import messages
+from django.views.decorators.http import require_POST
 
 import google.oauth2.credentials
 import google_auth_oauthlib.flow
@@ -193,6 +194,16 @@ def merged_calendar(request, id, user=None):
 
 def merged_calendar_view(request, id):
     raise Exception
+
+@needs_login
+@require_POST
+def delete_merged_calendar(request, id, user=None):
+    mc = MergedCalendar.objects.get(id=id)
+    if mc.user != user:
+        return redirect(reverse('home'))
+    mc.delete()
+    messages.success(request, "Deleted '%s'" % mc.name)
+    return redirect(reverse('home'))
 
 
 def logout(request):

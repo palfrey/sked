@@ -6,7 +6,11 @@
     <form action="{% url 'merged_calendar' mc.id %}" method="post">
         {% csrf_token %}
         {{ form }}
-        <input class="form-control" type="submit" value="Submit" />
+        <input class="form-control btn btn-primary" type="submit" value="Submit" />
+    </form>
+    <form action="{% url 'delete_merged_calendar' mc.id %}" method="post">
+        {% csrf_token %}
+        <input class="form-control btn btn-danger" type="submit" value="Delete merged calendar" />
     </form>
     <br />
     iCal Url: <a href="{{ url }}">{{ url }}</a>
