@@ -19,7 +19,8 @@ class GoogleCalendar(models.Model):
         return self.name
 
 class IcalCalendar(models.Model):
-    url = models.URLField(primary_key=True)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    url = models.URLField(unique=True)
     user = models.ForeignKey(GoogleUser, on_delete=models.CASCADE, related_name='i_calendars')
     name = models.CharField(max_length=255)
     last_retrieved_at = models.DateTimeField()
@@ -56,6 +57,7 @@ class MergedCalendar(models.Model):
         ordering = ["name"]
 
 class CalendarAccess(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     mergedCalendar = models.ForeignKey(MergedCalendar, on_delete=models.CASCADE, related_name='access')
 
     # Only one of these two should be non-null
