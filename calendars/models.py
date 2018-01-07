@@ -52,6 +52,9 @@ class MergedCalendar(models.Model):
         ac.save()
         return ac
 
+    class Meta:
+        ordering = ["name"]
+
 class CalendarAccess(models.Model):
     mergedCalendar = models.ForeignKey(MergedCalendar, on_delete=models.CASCADE, related_name='access')
 
