@@ -34,7 +34,7 @@
           {% endfor %}
         </tr>
         {% endfor %}
-        <tr><td colspan="{{ m_calendars|length|add:'1' }}"><input class="btn-success form-control" type="submit" value="Save changes" /></td></tr>
+        <tr><td colspan="{{ m_calendars|length|add:'1' }}"><input id="save-changes" class="btn btn-success form-control" disabled type="submit" value="Save changes" /></td></tr>
       </tbody>
     </table>
   </form>
@@ -42,4 +42,11 @@
   {% endif %}
  </div>
 </div>
+<script>
+  $(".access-view").change(function(event){
+    console.log("foo");
+    event.preventDefault();
+    $('#save-changes').removeAttr("disabled");
+ });
+</script>
 {% endblock %}
