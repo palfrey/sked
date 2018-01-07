@@ -148,7 +148,7 @@ def add_calendar(request, user=None):
                         new_cal.name = parsed.get('X-WR-CALNAME', "")
                         new_cal.last_retrieved_at = datetime.datetime.now()
                         new_cal.save()
-                        messages.success(request, 'Calendar added')
+                        messages.success(request, "Calendar '%s' added" % new_cal.name)
                         return redirect(reverse('home'))
                     except ValueError:
                         form.add_error("calendar_url", "Bad iCal file at %s (or possibly not one at all)" % url)
