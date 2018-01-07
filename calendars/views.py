@@ -162,7 +162,7 @@ def add_calendar(request, user=None):
 @needs_login
 def add_merged_calendar(request, user=None):
     if request.method == 'POST':
-        form = NewMergedCalendarForm(request.POST)
+        form = MergedCalendarForm(request.POST)
         if form.is_valid():
             name = form.cleaned_data['name']
             if MergedCalendar.objects.filter(name=name, user=user).exists():
@@ -173,11 +173,25 @@ def add_merged_calendar(request, user=None):
                 messages.success(request, "Merged calendar added for '%s'" % name)
                 return redirect(reverse('home'))
     else:
-        form = NewMergedCalendarForm()
+        form = MergedCalendarForm()
     return render(request, "new_merged_calendar.html", {"form": form})
 
 @needs_login
 def merged_calendar(request, id, user=None):
+    mc = MergedCalendar.objects.get(id=id)
+    if mc.user != user:
+        return redirect(reverse('home'))
+    if request.method == 'POST':
+        form = MergedCalendarForm(request.POST)
+        if form.is_valid():
+            mc.name = form.cleaned_data['name']
+            messages.success(request, "Updated name to '%s'" % mc.name)
+            mc.save()
+    else:
+        form = MergedCalendarForm({"name":mc.name})
+    return render(request, "merged_calendar.html", {"mc": mc, "form": form, "url": request.build_absolute_uri(reverse("merged_calendar_view", args=[mc.id]))})
+
+def merged_calendar_view(request, id):
     raise Exception
 
 

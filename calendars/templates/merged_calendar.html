@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row">
+ <div class="col s12 m6 offset-m3">
+    <h2>Merged calendar</h2>
+    <form action="{% url 'merged_calendar' mc.id %}" method="post">
+        {% csrf_token %}
+        {{ form }}
+        <input class="form-control" type="submit" value="Submit" />
+    </form>
+    <br />
+    iCal Url: <a href="{{ url }}">{{ url }}</a>
+ </div>
+</div>
+{% endblock %}
