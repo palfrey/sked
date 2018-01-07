@@ -138,20 +138,23 @@ def add_calendar(request, user=None):
         form = NewCalendarForm(request.POST)
         if form.is_valid():
             url = form.cleaned_data['calendar_url']
-            cal = requests.get(url)
-            if cal.status_code == 200:
-                try:
-                    parsed = icalendar.Calendar.from_ical(cal.text)
-                    new_cal, _ = IcalCalendar.objects.get_or_create(url=url, user=user, defaults={'last_retrieved_at': datetime.datetime.now()})
-                    new_cal.name = parsed.get('X-WR-CALNAME', "")
-                    new_cal.last_retrieved_at = datetime.datetime.now()
-                    new_cal.save()
-                    messages.success(request, 'Calendar added')
-                    return redirect(reverse('home'))
-                except ValueError:
-                    form.add_error("calendar_url", "Bad iCal file at %s (or possibly not one at all)" % url)
-            else:
-                form.add_error("calendar_url", "Bad response from %s: %s - %s" % (url, cal.status_code, cal.reason))
+            try:
+                cal = requests.get(url)
+                if cal.status_code == 200:
+                    try:
+                        parsed = icalendar.Calendar.from_ical(cal.text)
+                        new_cal, _ = IcalCalendar.objects.get_or_create(url=url, user=user, defaults={'last_retrieved_at': datetime.datetime.now()})
+                        new_cal.name = parsed.get('X-WR-CALNAME', "")
+                        new_cal.last_retrieved_at = datetime.datetime.now()
+                        new_cal.save()
+                        messages.success(request, 'Calendar added')
+                        return redirect(reverse('home'))
+                    except ValueError:
+                        form.add_error("calendar_url", "Bad iCal file at %s (or possibly not one at all)" % url)
+                else:
+                    form.add_error("calendar_url", "Bad response from %s: %s - %s" % (url, cal.status_code, cal.reason))
+            except:
+                form.add_error("calendar_url", "Error getting %s" % url)
     else:
         form = NewCalendarForm()
     return render(request, "new_calendar.html", {"form": form})
