@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import logout
 from django.conf import settings
 from django.urls import reverse
@@ -198,13 +198,22 @@ def merged_calendar_view(request, id):
 @needs_login
 @require_POST
 def delete_merged_calendar(request, id, user=None):
-    mc = MergedCalendar.objects.get(id=id)
+    mc = get_object_or_404(MergedCalendar, id=id)
     if mc.user != user:
         return redirect(reverse('home'))
     mc.delete()
     messages.success(request, "Deleted '%s'" % mc.name)
     return redirect(reverse('home'))
 
+@needs_login
+@require_POST
+def delete_calendar(request, id, user=None):
+    ic = get_object_or_404(IcalCalendar, id=id)
+    if ic.user != user:
+        return redirect(reverse('home'))
+    ic.delete()
+    messages.success(request, "Deleted '%s'" % ic.name)
+    return redirect(reverse('home'))
 
 def logout(request):
     del request.session["email"]
