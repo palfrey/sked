@@ -2,6 +2,8 @@
 {% block content %}
 <div class="row">
  <div class="col s12 m6 offset-m3">
+    <h2>New Merged calendar</h2>
+    <a href="{% url 'home' %}">Back to main page</a>
     <form action="{% url 'add_merged_calendar' %}" method="post">
         {% csrf_token %}
         {{ form }}

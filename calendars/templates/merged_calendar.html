@@ -3,6 +3,7 @@
 <div class="row">
  <div class="col s12 m6 offset-m3">
     <h2>Merged calendar</h2>
+    <a href="{% url 'home' %}">Back to main page</a>
     <form action="{% url 'merged_calendar' mc.id %}" method="post">
         {% csrf_token %}
         {{ form }}
