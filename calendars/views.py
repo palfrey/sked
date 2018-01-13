@@ -249,7 +249,8 @@ def merged_calendar_view(request, id):
             ical = cache.get(url)
             if ical == None:
                 data = requests.get(url)
-                data.raise_for_status()
+                if not data.ok:
+                    continue
                 ical = data.text
                 cache.set(url, ical)
             cal = icalendar.Calendar.from_ical(ical)
