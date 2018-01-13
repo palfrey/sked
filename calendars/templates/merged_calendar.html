@@ -14,6 +14,27 @@
     </form>
     <br />
     iCal Url: <a href="{{ url }}">{{ url }}</a>
+    <div id='calendar'></div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function(event) {
+            $('#calendar').fullCalendar({
+                header: {
+                    left: 'prev,next today',
+                    right: 'month,agendaWeek,agendaDay,listWeek'
+                },
+                navLinks: true,
+                eventLimit: true,
+                eventTextColor: 'white',
+                events: {
+                    url: '{% url 'merged_calendar_json' mc.id %}',
+                    error: function(e) {
+                        console.log('there was an error while fetching events!');
+                        console.log(e);
+                    },
+                }
+            });
+        });
+    </script>
  </div>
 </div>
 {% endblock %}

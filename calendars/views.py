@@ -5,7 +5,7 @@ from django.urls import reverse
 from django.contrib import messages
 from django.views.decorators.http import require_POST
 from django.core.cache import cache
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 
 import google.oauth2.credentials
 import google_auth_oauthlib.flow
@@ -218,7 +218,7 @@ def munge_event(event, access_level):
     else:
         raise Exception(event)
 
-def merged_calendar_view(request, id):
+def merged_calendar_core(id):
     mc = MergedCalendar.objects.get(id=id)
     main_cal = icalendar.Calendar()
     main_cal.add('prodid', '-//Sked//')
@@ -271,7 +271,26 @@ def merged_calendar_view(request, id):
                 main_cal.add_component(munge_event(event, ac.access_level))
         else:
             raise Exception(ac)
+    return main_cal
+
+def merged_calendar_view(request, id):
+    main_cal = merged_calendar_core(id)
     return HttpResponse(main_cal.to_ical())
+
+def merged_calendar_json(request, id):
+    start = iso8601.parse_date(request.GET['start'])
+    end = iso8601.parse_date(request.GET['end'])
+    res = merged_calendar_core(id)
+    events = []
+    for event in res.subcomponents:
+        if event['dtstart'].dt >= start and event['dtstart'].dt < end:
+            derived = {'start': event['dtstart'].dt, 'end': event['dtend'].dt, 'title': event['summary']}
+            if 'url' in event:
+                derived['url'] = event['url']
+            if event['dtstart'].dt.hour == 0:
+                derived['allDay'] = True
+            events.append(derived)
+    return JsonResponse(events, safe=False, json_dumps_params={"indent": 4})
 
 @needs_login
 @require_POST

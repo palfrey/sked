@@ -43,17 +43,19 @@
  </div>
 </div>
 <script>
-  $(".access-view").change(function(event){
-    console.log("foo");
-    event.preventDefault();
-    $('#save-changes').removeAttr("disabled");
-  });
-  $(".delete-button").click(function(event) {
-    event.preventDefault();
-    var url = $(event.target).data("url");
-    var form = $("<form action=\"" + url + "\" method=\"POST\">{% csrf_token %}</form>");
-    $(document.body).append(form);
-    form.submit();
+  document.addEventListener("DOMContentLoaded", function(event) {
+    $(".access-view").change(function(event){
+      console.log("foo");
+      event.preventDefault();
+      $('#save-changes').removeAttr("disabled");
+    });
+    $(".delete-button").click(function(event) {
+      event.preventDefault();
+      var url = $(event.target).data("url");
+      var form = $("<form action=\"" + url + "\" method=\"POST\">{% csrf_token %}</form>");
+      $(document.body).append(form);
+      form.submit();
+    });
   });
 </script>
 {% endblock %}
