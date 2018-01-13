@@ -13,7 +13,9 @@
         <input class="form-control btn btn-danger" type="submit" value="Delete merged calendar" />
     </form>
     <br />
-    iCal Url: <a href="{{ url }}">{{ url }}</a>
+    <span class="h3">iCal Url</span><span class="h4">: <a href="{{ url }}">{{ url }}</a></span>
+    <hr />
+    <h4>Calendar preview</h4>
     <div id='calendar'></div>
     <script>
         document.addEventListener("DOMContentLoaded", function(event) {
