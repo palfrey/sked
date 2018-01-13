@@ -203,6 +203,21 @@ def date_convert(when):
     else:
         raise Exception(when)
 
+def munge_event(event, access_level):
+    if access_level == 'yes':
+        return event
+    elif access_level == 'busy':
+        if 'summary' in event:
+            event['summary'] = 'BUSY'
+        if 'description' in event:
+            event['description'] = 'BUSY'
+        for x in ['location', 'organizer', 'url']:
+            if x in event:
+                del event[x]
+        return event
+    else:
+        raise Exception(event)
+
 def merged_calendar_view(request, id):
     mc = MergedCalendar.objects.get(id=id)
     main_cal = icalendar.Calendar()
@@ -213,8 +228,6 @@ def merged_calendar_view(request, id):
     for ac in mc.access.all():
         if ac.access_level == 'no':
             continue
-        if ac.access_level != 'yes':
-            raise Exception
         if ac.g_calendar != None:
             minTime = (datetime.datetime.now()-datetime.timedelta(days=30)).isoformat() + 'Z'
             data = cache.get(ac.g_calendar.id)
@@ -243,7 +256,7 @@ def merged_calendar_view(request, id):
                         organiser.params['cn'] = icalendar.vText(item['organizer']['displayName'])
                     event.add('organizer', organiser)
                 event['uid'] = item['iCalUID']
-                main_cal.add_component(event)
+                main_cal.add_component(munge_event(event, ac.access_level))
         elif ac.i_calendar != None:
             url = ac.i_calendar.url
             ical = cache.get(url)
@@ -254,8 +267,8 @@ def merged_calendar_view(request, id):
                 ical = data.text
                 cache.set(url, ical)
             cal = icalendar.Calendar.from_ical(ical)
-            for comp in cal.subcomponents:
-                main_cal.add_component(comp)
+            for event in cal.subcomponents:
+                main_cal.add_component(munge_event(event, ac.access_level))
         else:
             raise Exception(ac)
     return HttpResponse(main_cal.to_ical())
