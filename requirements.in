@@ -7,6 +7,7 @@ google-auth-oauthlib
 google-auth-httplib2
 icalendar
 requests
+iso8601
 
 # Heroku
 gunicorn

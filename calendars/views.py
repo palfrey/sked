@@ -17,6 +17,7 @@ import requests
 import icalendar
 import datetime
 from functools import wraps
+import iso8601
 
 scopes = ['https://www.googleapis.com/auth/userinfo.email',
           'https://www.googleapis.com/auth/userinfo.profile',
@@ -194,6 +195,14 @@ def merged_calendar(request, id, user=None):
         form = MergedCalendarForm({"name":mc.name})
     return render(request, "merged_calendar.html", {"mc": mc, "form": form, "url": request.build_absolute_uri(reverse("merged_calendar_view", args=[mc.id]))})
 
+def date_convert(when):
+    if 'dateTime' in when:
+        return iso8601.parse_date(when['dateTime'])
+    elif 'date' in when:
+        return iso8601.parse_date(when['date'])
+    else:
+        raise Exception(when)
+
 def merged_calendar_view(request, id):
     mc = MergedCalendar.objects.get(id=id)
     main_cal = icalendar.Calendar()
@@ -202,10 +211,39 @@ def merged_calendar_view(request, id):
     main_cal.add('X-WR-CALNAME', mc.user.name)
 
     for ac in mc.access.all():
-        if ac.access_level != 'yes':
+        if ac.access_level == 'no':
             continue
+        if ac.access_level != 'yes':
+            raise Exception
         if ac.g_calendar != None:
-            raise Exception(ac.g_calendar)
+            minTime = (datetime.datetime.now()-datetime.timedelta(days=30)).isoformat() + 'Z'
+            data = cache.get(ac.g_calendar.id)
+            if data == None:
+                credentials = make_credentials(mc.user)
+                calendar_service = build(
+                    serviceName='calendar', version='v3',
+                    credentials=credentials)
+                eventsResult = calendar_service.events().list(calendarId=ac.g_calendar.id, timeMin=minTime).execute()
+                data = eventsResult["items"]
+                cache.set(ac.g_calendar.id, data)
+            for item in data:
+                if item['status'] == 'cancelled':
+                    continue
+                event = icalendar.Event()
+                event.add('summary', item['summary'])
+                event.add('dtstart', date_convert(item['start']))
+                event.add('dtend', date_convert(item['end']))
+                try:
+                    event.add('dtstamp', iso8601.parse_date(item['created']))
+                except iso8601.ParseError:
+                    pass
+                if 'organizer' in item:
+                    organiser = icalendar.vCalAddress(item['organizer']['email'])
+                    if 'displayName' in item['organizer']:
+                        organiser.params['cn'] = icalendar.vText(item['organizer']['displayName'])
+                    event.add('organizer', organiser)
+                event['uid'] = item['iCalUID']
+                main_cal.add_component(event)
         elif ac.i_calendar != None:
             url = ac.i_calendar.url
             ical = cache.get(url)
