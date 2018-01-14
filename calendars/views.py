@@ -215,7 +215,7 @@ def add_merged_calendar(request, user=None):
 
 @needs_login
 def merged_calendar(request, id, user=None):
-    mc = MergedCalendar.objects.get(id=id)
+    mc = get_object_or_404(MergedCalendar, id=id)
     if mc.user != user:
         return redirect(reverse('home'))
     if request.method == 'POST':
@@ -252,7 +252,7 @@ def munge_event(event, access_level):
         raise Exception(event)
 
 def merged_calendar_core(id):
-    mc = MergedCalendar.objects.get(id=id)
+    mc = get_object_or_404(MergedCalendar, id=id)
     main_cal = icalendar.Calendar()
     main_cal.add('prodid', '-//Sked//')
     main_cal.add('version', '2.0')
