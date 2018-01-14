@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load calendar_tags %}
 {% block content %}
 <div class="row">
  <div class="col s12 m6 offset-m3">
@@ -15,6 +16,19 @@
     <br />
     <span class="h3">iCal Url</span><span class="h4">: <a href="{{ url }}">{{ url }}</a></span>
     <hr />
+    <h4>Access list</h4>
+    <form action="{% url 'update_access_merged' mc.id %}" method="post">
+        {% csrf_token %}
+        <ul>
+            {% for cal in user.g_calendars.all %}
+            <li>Google: {{ cal.name }}: {% access cal mc %}</td>
+            {% endfor %}
+            {% for cal in user.i_calendars.all %}
+            <li>{{ cal.name }}: {% access cal mc %}</td>
+            {% endfor %}
+        </ul>
+        <input id="save-changes" class="btn btn-success form-control" disabled type="submit" value="Save changes" />
+    </form>
     <h4>Calendar preview</h4>
     <div id='calendar'></div>
     <script>
@@ -34,6 +48,10 @@
                         console.log(e);
                     },
                 }
+            });
+            $(".access-view").change(function(event){
+                event.preventDefault();
+                $('#save-changes').removeAttr("disabled");
             });
         });
     </script>

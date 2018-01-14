@@ -95,15 +95,23 @@ def home(request):
         data = {'user': None, 'auth_url': authorization_url}
     return render(request, 'home.html', data)
 
-@needs_login
-def update_access(request, user=None):
+def update_access_core(request, user):
     for mc in user.m_calendars.all():
         for ac in mc.access.all():
             if str(ac.id) in request.POST:
                 ac.access_level = request.POST[str(ac.id)]
                 ac.save()
     messages.success(request, 'Permissions updated')
+
+@needs_login
+def update_access(request, user=None):
+    update_access_core(request, user)
     return redirect(reverse('home'))
+
+@needs_login
+def update_access_merged(request, id, user=None):
+    update_access_core(request, user)
+    return redirect(reverse('merged_calendar', args=[id]))
 
 def oauth2callback(request):
     state = request.session['state']
@@ -215,7 +223,7 @@ def merged_calendar(request, id, user=None):
             mc.save()
     else:
         form = MergedCalendarForm({"name":mc.name})
-    return render(request, "merged_calendar.html", {"mc": mc, "form": form, "url": request.build_absolute_uri(reverse("merged_calendar_view", args=[mc.id]))})
+    return render(request, "merged_calendar.html", {"user": user, "mc": mc, "form": form, "url": request.build_absolute_uri(reverse("merged_calendar_view", args=[mc.id]))})
 
 def date_convert(when):
     if 'dateTime' in when:
