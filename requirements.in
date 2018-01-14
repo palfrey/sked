@@ -11,6 +11,7 @@ iso8601
 
 # Heroku
 gunicorn
+whitenoise
 
 # Managing this file
 pip-tools
