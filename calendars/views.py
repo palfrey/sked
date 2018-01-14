@@ -266,16 +266,23 @@ def merged_calendar_core(id):
             continue
         if ac.g_calendar != None:
             minTime = (datetime.datetime.now()-datetime.timedelta(days=30)).isoformat() + 'Z'
-            data = cache.get(ac.g_calendar.id)
-            if data == None:
+            maxTime = (datetime.datetime.now()+datetime.timedelta(days=365)).isoformat() + 'Z'
+            items = cache.get(ac.g_calendar.id)
+            if items == None:
                 credentials = make_credentials(mc.user)
                 calendar_service = build(
                     serviceName='calendar', version='v3',
                     credentials=credentials)
-                eventsResult = calendar_service.events().list(calendarId=ac.g_calendar.id, timeMin=minTime).execute()
-                data = eventsResult["items"]
-                cache.set(ac.g_calendar.id, data)
-            for item in data:
+                items = []
+                pageToken = None
+                while True:
+                    eventsResult = calendar_service.events().list(calendarId=ac.g_calendar.id, timeMin=minTime, timeMax=maxTime, singleEvents=True, maxResults=2500, pageToken=None).execute()
+                    items += eventsResult["items"]
+                    if "nextPageToken" not in eventsResult:
+                        break
+                    pageToken = eventsResult["nextPageToken"]
+                cache.set(ac.g_calendar.id, items)
+            for item in items:
                 if item['status'] == 'cancelled':
                     continue
                 event = icalendar.Event()
