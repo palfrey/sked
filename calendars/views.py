@@ -230,9 +230,9 @@ def merged_calendar(request, id, user=None):
 
 def date_convert(when):
     if 'dateTime' in when:
-        return iso8601.parse_date(when['dateTime'])
+        return icalendar.vDatetime(iso8601.parse_date(when['dateTime']))
     elif 'date' in when:
-        return iso8601.parse_date(when['date'])
+        return icalendar.vDate(iso8601.parse_date(when['date']))
     else:
         raise Exception(when)
 
