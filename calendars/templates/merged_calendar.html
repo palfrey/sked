@@ -14,7 +14,7 @@
         <input class="form-control btn btn-danger" type="submit" value="Delete merged calendar" />
     </form>
     <br />
-    <span class="h3">iCal Url</span><span class="h4">: <a href="{{ url }}">{{ url }}</a></span>
+    <span class="h3">iCal Url</span><span class="h4">: <a href="{{ url }}">{{ url }}</a></span> (<a href="{% url 'guide' %}" target="_blank">How do I use this?</a>)
     <hr />
     <h4>Access list</h4>
     <form action="{% url 'update_access_merged' mc.id %}" method="post">

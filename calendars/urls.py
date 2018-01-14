@@ -15,5 +15,6 @@ urlpatterns = [
     path('update_access/all', views.update_access, name='update_access'),
     path('update_access/<uuid:id>', views.update_access_merged, name='update_access_merged'),
     path('account/logout/', views.logout, name='logout'),
-    path('about', views.about_sked, name='about_sked')
+    path('about', views.about_sked, name='about_sked'),
+    path('guide', views.guide, name='guide')
 ]

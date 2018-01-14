@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<div class="row">
+  <div class="col s12 m6 offset-m3">
+    <h2>Guide for using iCal URLs</h2>
+    <br />
+    <h3>Google Calendar</h3>
+    Click the "+" next to "Add a friend's calendar" in the left hand menu and pick "From URL"<br />
+    <img src="{% static 'google_add_by_url.png' %}" /><br />
+    On the next page, insert the URL from Sked in "URL of calendar"<br />
+    <br />
+    <h3>Apple Calendar app</h3>
+    <a href="https://support.apple.com/en-gb/guide/calendar/subscribe-to-calendars-icl1022/mac">Follow the official support instructions</a>
+    <br />
+    <h3>Thunderbird</h3>
+    <a href="https://support.mozilla.org/en-US/kb/creating-new-calendars#w_icalendar-ics">Follow the knowledgebase article on this</a>
+  </div>
+</div>
+{% endblock %}
