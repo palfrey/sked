@@ -23,6 +23,9 @@ scopes = ['https://www.googleapis.com/auth/userinfo.email',
           'https://www.googleapis.com/auth/userinfo.profile',
           'https://www.googleapis.com/auth/calendar.readonly']
 
+def about_sked(request):
+    return render(request, 'about_sked.html')
+
 def make_flow(request):
     callback = request.build_absolute_uri(reverse('oauth2callback'))
     oauth_config = {'web': {
