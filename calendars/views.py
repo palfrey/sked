@@ -137,6 +137,28 @@ def oauth2callback(request):
     return redirect(reverse('home'))
 
 @needs_login
+def refresh_gcalendars(request, user=None):
+    credentials = make_credentials(user)
+    calendar_service = build(
+        serviceName='calendar', version='v3',
+        credentials=credentials)
+    calendars = calendar_service.calendarList().list(minAccessRole="owner").execute()['items']
+    existing_calendars = dict([(cal.id, cal) for cal in user.g_calendars.all()])
+    for calendar in calendars:
+        id = calendar['id']
+        if id in existing_calendars:
+            del existing_calendars[id]
+        else:
+            cal, _ = GoogleCalendar.objects.get_or_create(id=calendar['id'], user=user, name=calendar['summary'], primary=calendar.get('primary', False))
+            cal.save()
+    user.calendars_retrieved_at = datetime.datetime.now()
+    user.save()
+    for calendar in existing_calendars.values():
+        calendar.delete()
+    messages.success(request, "Google Calendars updated")
+    return redirect(reverse('home'))
+
+@needs_login
 def add_calendar(request, user=None):
     if request.method == 'POST':
         form = NewCalendarForm(request.POST)
