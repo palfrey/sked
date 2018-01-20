@@ -41,6 +41,7 @@
                 navLinks: true,
                 eventLimit: true,
                 eventTextColor: 'white',
+                firstDay: 1,
                 events: {
                     url: '{% url 'merged_calendar_json' mc.id %}',
                     error: function(e) {
