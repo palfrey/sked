@@ -326,6 +326,8 @@ def merged_calendar_json(request, id):
     res = merged_calendar_core(id)
     events = []
     for event in res.subcomponents:
+        if 'dtstart' not in event:
+            continue
         if event['dtstart'].dt >= start and event['dtstart'].dt < end:
             derived = {'start': event['dtstart'].dt, 'end': event['dtend'].dt, 'title': event['summary']}
             if 'url' in event:
