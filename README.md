@@ -17,3 +17,15 @@ Local development
 4. Copy `sked/settings_private_example.py` to `sked/settings_private.py` and add your new OAuth secret/ID
 5. Run `docker-compose up --build`
 6. Goto [http://localhost:8000](http://localhost:8000)
+
+Docker-less local builds
+------------------------
+The Docker build is the best option, but here's how to do it without
+
+1. Export needed environment variables
+    * `export DATABASE_URL=sqlite:///sked.db`
+    * `export OAUTHLIB_INSECURE_TRANSPORT=1`
+2. Do steps 2-4 of "Local development" to setup Google auth
+3. `python manage.py migrate`
+4. `python manage.py runserver 0.0.0.0:8000`
+5. Goto [http://localhost:8000](http://localhost:8000)
