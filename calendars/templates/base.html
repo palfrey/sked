@@ -43,7 +43,7 @@
                         </li>
                         {% url 'add_merged_calendar' as merged_url %}
                         <li class="nav-item">
-                            <a class="nav-link{% if request.path == merged_url %} active{% endif %}" href="{% url 'add_merged_calendar' %}">Add merged calendar</a>
+                            <a class="nav-link{% if request.path == merged_url %} active{% endif %}" href="{% url 'add_merged_calendar' %}">Create merged calendar</a>
                         </li>
                         {% url 'add_calendar' as calendar_url %}
                         <li class="nav-item">
