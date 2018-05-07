@@ -3,12 +3,12 @@
 {% block content %}
 <div class="row">
  <div class="col s12 m6 offset-m3">
-    <h2>New calendar</h2>
+    <h2>Add calendar</h2>
     The calendar URL needs to be an <a href="https://en.wikipedia.org/wiki/ICalendar">iCal(endar) feed</a>
     <form action="{% url 'add_calendar' %}" method="post">
         {% csrf_token %}
         {{ form }}
-        <input class="form-control btn btn-primary" type="submit" value="Submit" />
+        <input class="form-control btn btn-primary" type="submit" value="Add calendar" />
     </form>
     <br />
     <h2>Getting iCal feed urls</h2>
