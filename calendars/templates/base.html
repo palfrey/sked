@@ -47,7 +47,7 @@
                         </li>
                         {% url 'add_calendar' as calendar_url %}
                         <li class="nav-item">
-                            <a class="nav-link{% if request.path == calendar_url %} active{% endif %}" href="{% url 'add_calendar' %}">Add iCal calendar</a>
+                            <a class="nav-link{% if request.path == calendar_url %} active{% endif %}" href="{% url 'add_calendar' %}">Add calendar</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'refresh_gcalendars' %}">Refresh Google Calendar list</a>

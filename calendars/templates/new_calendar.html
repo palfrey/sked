@@ -1,13 +1,28 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block content %}
 <div class="row">
  <div class="col s12 m6 offset-m3">
-    <h2>New iCal calendar</h2>
+    <h2>New calendar</h2>
+    The calendar URL needs to be an <a href="https://en.wikipedia.org/wiki/ICalendar">iCal(endar) feed</a>
     <form action="{% url 'add_calendar' %}" method="post">
         {% csrf_token %}
         {{ form }}
         <input class="form-control btn btn-primary" type="submit" value="Submit" />
     </form>
+    <br />
+    <h2>Getting iCal feed urls</h2>
+    You can use feeds from anywhere, but here's a couple of guides for popular sites.
+    <h3>Facebook</h3>
+    Goto the <a href="https://www.facebook.com/events/">Facebook events page</a> and find the "Upcoming events" link on the right hand side at the bottom.
+    Right click and "Copy link address".<br />
+    <img src="{% static 'calendars/facebook_export.png' %}" /><br />
+    <h3>Meetup</h3>
+    Login to <a href="https://www.meetup.com/">Meetup</a> and click the "Export to" link below your calendar on the right hand side.
+    Right click and "Copy link address" on the "iCal calendar" option<br />
+    <img src="{% static 'calendars/meetup_export.png' %}" /><br />
+    <h3>Eventbrite</h3>
+    Use my <a href="https://eventbrite.tevp.net/">Eventbrite calendar exporter</a> and copy the end URL (should start "https://eventbrite.tevp.net/calendar/").
  </div>
 </div>
 {% endblock %}
