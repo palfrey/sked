@@ -1,5 +1,6 @@
 <select name="{{ id }}" class="access-view">
     <option{% if chosen == 'yes' %} selected{% endif %} value="yes">Yes</option>
-    <option{% if chosen == 'busy' %} selected{% endif %} value="busy">Busy</option>
+    <option{% if chosen == 'busy' %} selected{% endif %} value="busy">Busy only</option>
+    <option{% if chosen == 'alld' %} selected{% endif %} value="alld">All-day events</option>
     <option{% if chosen == 'no' %} selected{% endif %} value="no">No</option>
 </select>

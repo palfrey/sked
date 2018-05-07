@@ -240,9 +240,12 @@ def date_convert(when):
     else:
         raise Exception(when)
 
-def munge_event(event, access_level):
-    if access_level == 'yes':
-        return event
+def add_event(cal, event, access_level):
+    if access_level == "yes":
+        pass
+    elif access_level == "alld":
+        if event['dtstart'].dt.hour != 0:
+            return
     elif access_level == 'busy':
         if 'summary' in event:
             event['summary'] = 'BUSY'
@@ -251,9 +254,9 @@ def munge_event(event, access_level):
         for x in ['location', 'organizer', 'url']:
             if x in event:
                 del event[x]
-        return event
     else:
         raise Exception(event)
+    cal.add_component(event)
 
 def merged_calendar_core(id):
     mc = get_object_or_404(MergedCalendar, id=id)
@@ -300,7 +303,7 @@ def merged_calendar_core(id):
                         organiser.params['cn'] = icalendar.vText(item['organizer']['displayName'])
                     event.add('organizer', organiser)
                 event['uid'] = item['iCalUID']
-                main_cal.add_component(munge_event(event, ac.access_level))
+                add_event(main_cal, event, ac.access_level)
         elif ac.i_calendar != None:
             url = ac.i_calendar.url
             ical = cache.get(url)
@@ -312,7 +315,7 @@ def merged_calendar_core(id):
                 cache.set(url, ical)
             cal = icalendar.Calendar.from_ical(ical)
             for event in cal.subcomponents:
-                main_cal.add_component(munge_event(event, ac.access_level))
+                add_event(main_cal, event, ac.access_level)
         else:
             raise Exception(ac)
     return main_cal

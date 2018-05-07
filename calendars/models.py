@@ -68,6 +68,7 @@ class CalendarAccess(models.Model):
         (NO_ACCESS, 'No'),
         ('busy', 'Busy'),
         ('yes', 'Yes'),
+        ('alld', 'All-day events only')
     )
     access_level = models.CharField(choices=ACCESS_CHOICES, default=NO_ACCESS, max_length=4)
 
