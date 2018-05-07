@@ -26,7 +26,7 @@
         {% for cal in g_calendars %}
         <tr>
           {% if cal == g_calendars.0 %}
-          <td rowspan="{{ g_calendars|length }}">Access to calendar</th>
+          <td rowspan="{{ total_cals }}"><b>Access to calendar</b></th>
           {% endif %}
           <td>Google: {{ cal.name }}</td>
           {% for m_cal in m_calendars %}

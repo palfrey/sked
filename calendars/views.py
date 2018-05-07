@@ -89,7 +89,8 @@ def home(request):
         data = {"user": user,
                 "g_calendars": list(user.g_calendars.all()),
                 "i_calendars": list(user.i_calendars.all()),
-                "m_calendars": list(user.m_calendars.all())}
+                "m_calendars": list(user.m_calendars.all()),
+                "total_cals": user.g_calendars.count() + user.i_calendars.count()}
     else:
         flow = make_flow(request)
 
