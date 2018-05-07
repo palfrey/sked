@@ -178,6 +178,7 @@ def add_calendar(request, user=None):
         form = NewCalendarForm(request.POST)
         if form.is_valid():
             url = form.cleaned_data['calendar_url']
+            url = url.replace("webcal://", "http://")
             try:
                 cal = requests.get(url)
                 if cal.status_code == 200:
