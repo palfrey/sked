@@ -11,13 +11,13 @@
   afterwards - this means if you add new calendars, you don't need to tell anyone else. Also, if you gave someone too much/too little access, you can fix that.</p>
   To begin <a class="btn btn-primary" href="{{ auth_url }}">Login to Google</a>
   {% else %}
-  <h2>Calendars for {{ user.name }}</h2>
+  <h2>Overview of calendars for {{ user.name }}</h2>
   <form action="{% url 'update_access' %}" method="post">
     {% csrf_token %}
     <table class="table table-hover table-responsive">
       <thead>
         <tr>
-          <th>&nbsp;</th>
+          <th colspan="2">Merged calendars (click to view/edit)</th>
           {% for cal in m_calendars %}
           <th><a href="{% url 'merged_calendar' cal.id %}">{{ cal.name }}</a></th>
           {% endfor %}
@@ -25,6 +25,9 @@
       <tbody>
         {% for cal in g_calendars %}
         <tr>
+          {% if cal == g_calendars.0 %}
+          <td rowspan="{{ g_calendars|length }}">Access to calendar</th>
+          {% endif %}
           <td>Google: {{ cal.name }}</td>
           {% for m_cal in m_calendars %}
           <td>{% access cal m_cal %}</td>
@@ -39,7 +42,7 @@
           {% endfor %}
         </tr>
         {% endfor %}
-        <tr><td colspan="{{ m_calendars|length|add:'1' }}"><input id="save-changes" class="btn btn-success form-control" disabled type="submit" value="Save changes" /></td></tr>
+        <tr><td colspan="{{ m_calendars|length|add:'2' }}"><input id="save-changes" class="btn btn-success form-control" disabled type="submit" value="Save changes" /></td></tr>
       </tbody>
     </table>
   </form>
