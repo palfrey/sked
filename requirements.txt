@@ -22,7 +22,7 @@ idna==2.7                 # via requests
 iso8601==0.1.12
 oauth2client==4.1.2       # via google-api-python-client
 oauthlib==2.1.0           # via requests-oauthlib
-pip-tools==1.11.0
+pip-tools==2.0.2
 psycopg2==2.7.3.2
 pyasn1-modules==0.2.1     # via google-auth, oauth2client
 pyasn1==0.4.2             # via google-auth, oauth2client, pyasn1-modules, rsa
