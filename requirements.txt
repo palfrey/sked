@@ -25,7 +25,7 @@ oauthlib==2.1.0           # via requests-oauthlib
 pip-tools==2.0.2
 psycopg2==2.7.5
 pyasn1-modules==0.2.2     # via google-auth, oauth2client
-pyasn1==0.4.2             # via google-auth, oauth2client, pyasn1-modules, rsa
+pyasn1==0.4.3             # via google-auth, oauth2client, pyasn1-modules, rsa
 python-dateutil==2.6.1    # via icalendar
 pytz==2017.3              # via django, icalendar
 requests-oauthlib==0.8.0  # via google-auth-oauthlib
