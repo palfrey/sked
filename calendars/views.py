@@ -120,6 +120,12 @@ def update_access_merged(request, id, user=None):
     update_access_core(request, user)
     return redirect(reverse('merged_calendar', args=[id]))
 
+def get_gcalendars(credentials):
+    calendar_service = build(
+        serviceName='calendar', version='v3',
+        credentials=credentials)
+    return calendar_service.calendarList().list(minAccessRole="reader").execute()['items']
+
 def oauth2callback(request):
     state = request.session['state']
     flow = make_flow(request)
@@ -140,10 +146,7 @@ def oauth2callback(request):
     user.save()
     request.session['email'] = user.email
     if created:
-        calendar_service = build(
-            serviceName='calendar', version='v3',
-            credentials=credentials)
-        calendars = calendar_service.calendarList().list(minAccessRole="owner").execute()['items']
+        calendars = get_gcalendars(credentials)
         for calendar in calendars:
             cal, created = GoogleCalendar.objects.get_or_create(id=calendar['id'], user=user, name=calendar['summary'], primary=calendar.get('primary', False))
             cal.save()
@@ -154,10 +157,7 @@ def oauth2callback(request):
 @needs_login
 def refresh_gcalendars(request, user=None):
     credentials = make_credentials(user)
-    calendar_service = build(
-        serviceName='calendar', version='v3',
-        credentials=credentials)
-    calendars = calendar_service.calendarList().list(minAccessRole="owner").execute()['items']
+    calendars = get_gcalendars(credentials)
     existing_calendars = dict([(cal.id, cal) for cal in user.g_calendars.all()])
     for calendar in calendars:
         id = calendar['id']
