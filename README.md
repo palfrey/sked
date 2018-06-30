@@ -1,5 +1,6 @@
 Sked
 ====
+[![Updates](https://pyup.io/repos/github/palfrey/sked/shield.svg)](https://pyup.io/repos/github/palfrey/sked/)
 
 Sked lets you solve the problem of "I have all these calendars and I want to share (some) of them with other people". It lets you take any combination of Google calendars and arbitrary other [iCalendar](https://en.wikipedia.org/wiki/ICalendar) feeds and make new feeds that you can then share with people. You can also only share the "I'm busy" data from a calendar, instead of it's full data if you want.
 
