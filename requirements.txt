@@ -29,7 +29,7 @@ pyasn1==0.4.3             # via google-auth, oauth2client, pyasn1-modules, rsa
 python-dateutil==2.7.3    # via icalendar
 pytz==2018.5              # via django, icalendar
 requests-oauthlib==1.0.0  # via google-auth-oauthlib
-requests==2.18.4
+requests==2.19.1
 rsa==3.4.2                # via google-auth, oauth2client
 six==1.11.0               # via google-api-python-client, google-auth, oauth2client, pip-tools, python-dateutil
 uritemplate==3.0.0        # via google-api-python-client
