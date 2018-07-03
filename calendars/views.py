@@ -364,7 +364,7 @@ def calendar_json_core(request, res):
 
 def merged_calendar_json(request, id):
     res = merged_calendar_core(id)
-    return calendar_json_core(res)
+    return calendar_json_core(request, res)
 
 @needs_login
 @require_POST
