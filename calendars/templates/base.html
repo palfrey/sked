@@ -52,6 +52,10 @@
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'refresh_gcalendars' %}">Refresh Google Calendar list</a>
                         </li>
+                        {% url 'my_calendar' as my_calendar %}
+                        <li class="nav-item">
+                            <a class="nav-link{% if request.path == my_calendar %} active{% endif %}" href="{% url 'my_calendar' %}">My calendar</a>
+                        </li>
                         {% url 'about_sked' as about_url %}
                         <li class="nav-item">
                             <a class="nav-link{% if request.path == about_url %} active{% endif %}" href="{% url 'about_sked' %}">About Sked</a>

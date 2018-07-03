@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% load calendar_tags %}
+{% block content %}
+<div class="row">
+ <div class="col s12 m6 offset-m3">
+    <h2>My calendar</h2>
+    <div id='calendar'></div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function(event) {
+            $('#calendar').fullCalendar({
+                header: {
+                    left: 'prev,next today',
+                    right: 'month,agendaWeek,agendaDay,listWeek'
+                },
+                navLinks: true,
+                eventLimit: true,
+                eventTextColor: 'white',
+                firstDay: 1,
+                events: {
+                    url: '{% url 'my_calendar_json' %}',
+                    error: function(e) {
+                        console.log('there was an error while fetching events!');
+                        console.log(e);
+                    },
+                }
+            });
+            $(".access-view").change(function(event){
+                event.preventDefault();
+                $('#save-changes').removeAttr("disabled");
+            });
+        });
+    </script>
+ </div>
+</div>
+{% endblock %}

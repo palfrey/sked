@@ -233,6 +233,22 @@ def merged_calendar(request, id, user=None):
         form = MergedCalendarForm({"name":mc.name})
     return render(request, "merged_calendar.html", {"user": user, "mc": mc, "form": form, "url": request.build_absolute_uri(reverse("merged_calendar_view", args=[mc.id]))})
 
+@needs_login
+def my_calendar(request, user=None):
+    return render(request, "my_calendar.html", {"user": user})
+
+@needs_login
+def my_calendar_json(request, user=None):
+    res = icalendar.Calendar()
+    res.add('prodid', '-//Sked//')
+    res.add('version', '2.0')
+    res.add('X-WR-CALNAME', user.name)
+    for gcal in user.g_calendars.all():
+        add_gcalendar(res, gcal.id, "yes", user)
+    for ical in user.i_calendars.all():
+        add_icalendar(res, ical.url, "yes")
+    return calendar_json_core(request, res)
+
 def date_convert(when):
     if 'dateTime' in when:
         return icalendar.vDatetime(iso8601.parse_date(when['dateTime']))
@@ -259,6 +275,55 @@ def add_event(cal, event, access_level):
         raise Exception(event)
     cal.add_component(event)
 
+def add_gcalendar(main_cal, id, access_level, user):
+    minTime = (datetime.datetime.now()-datetime.timedelta(days=30)).isoformat() + 'Z'
+    maxTime = (datetime.datetime.now()+datetime.timedelta(days=365)).isoformat() + 'Z'
+    items = cache.get(id)
+    if items == None:
+        credentials = make_credentials(user)
+        calendar_service = build(
+            serviceName='calendar', version='v3',
+            credentials=credentials)
+        items = []
+        pageToken = None
+        while True:
+            eventsResult = calendar_service.events().list(calendarId=id, timeMin=minTime, timeMax=maxTime, singleEvents=True, maxResults=2500, pageToken=None).execute()
+            items += eventsResult["items"]
+            if "nextPageToken" not in eventsResult:
+                break
+            pageToken = eventsResult["nextPageToken"]
+        cache.set(id, items)
+    for item in items:
+        if item['status'] == 'cancelled':
+            continue
+        event = icalendar.Event()
+        event.add('summary', item['summary'])
+        event.add('dtstart', date_convert(item['start']))
+        event.add('dtend', date_convert(item['end']))
+        try:
+            event.add('dtstamp', iso8601.parse_date(item['created']))
+        except iso8601.ParseError:
+            pass
+        if 'organizer' in item:
+            organiser = icalendar.vCalAddress(item['organizer']['email'])
+            if 'displayName' in item['organizer']:
+                organiser.params['cn'] = icalendar.vText(item['organizer']['displayName'])
+            event.add('organizer', organiser)
+        event['uid'] = item['iCalUID']
+        add_event(main_cal, event, access_level)
+
+def add_icalendar(main_cal, url, access_level):
+    ical = cache.get(url)
+    if ical == None:
+        data = requests.get(url)
+        if not data.ok:
+            return
+        ical = data.text
+        cache.set(url, ical)
+    cal = icalendar.Calendar.from_ical(ical)
+    for event in cal.subcomponents:
+        add_event(main_cal, event, access_level)
+
 def merged_calendar_core(id):
     mc = get_object_or_404(MergedCalendar, id=id)
     main_cal = icalendar.Calendar()
@@ -270,53 +335,9 @@ def merged_calendar_core(id):
         if ac.access_level == 'no':
             continue
         if ac.g_calendar != None:
-            minTime = (datetime.datetime.now()-datetime.timedelta(days=30)).isoformat() + 'Z'
-            maxTime = (datetime.datetime.now()+datetime.timedelta(days=365)).isoformat() + 'Z'
-            items = cache.get(ac.g_calendar.id)
-            if items == None:
-                credentials = make_credentials(mc.user)
-                calendar_service = build(
-                    serviceName='calendar', version='v3',
-                    credentials=credentials)
-                items = []
-                pageToken = None
-                while True:
-                    eventsResult = calendar_service.events().list(calendarId=ac.g_calendar.id, timeMin=minTime, timeMax=maxTime, singleEvents=True, maxResults=2500, pageToken=None).execute()
-                    items += eventsResult["items"]
-                    if "nextPageToken" not in eventsResult:
-                        break
-                    pageToken = eventsResult["nextPageToken"]
-                cache.set(ac.g_calendar.id, items)
-            for item in items:
-                if item['status'] == 'cancelled':
-                    continue
-                event = icalendar.Event()
-                event.add('summary', item['summary'])
-                event.add('dtstart', date_convert(item['start']))
-                event.add('dtend', date_convert(item['end']))
-                try:
-                    event.add('dtstamp', iso8601.parse_date(item['created']))
-                except iso8601.ParseError:
-                    pass
-                if 'organizer' in item:
-                    organiser = icalendar.vCalAddress(item['organizer']['email'])
-                    if 'displayName' in item['organizer']:
-                        organiser.params['cn'] = icalendar.vText(item['organizer']['displayName'])
-                    event.add('organizer', organiser)
-                event['uid'] = item['iCalUID']
-                add_event(main_cal, event, ac.access_level)
+            add_gcalendar(main_cal, ac.g_calendar.id, ac.access_level, mc.user)
         elif ac.i_calendar != None:
-            url = ac.i_calendar.url
-            ical = cache.get(url)
-            if ical == None:
-                data = requests.get(url)
-                if not data.ok:
-                    continue
-                ical = data.text
-                cache.set(url, ical)
-            cal = icalendar.Calendar.from_ical(ical)
-            for event in cal.subcomponents:
-                add_event(main_cal, event, ac.access_level)
+            add_icalendar(main_cal, ac.i_calendar.url, ac.access_level)
         else:
             raise Exception(ac)
     return main_cal
@@ -325,10 +346,9 @@ def merged_calendar_view(request, id):
     main_cal = merged_calendar_core(id)
     return HttpResponse(main_cal.to_ical())
 
-def merged_calendar_json(request, id):
+def calendar_json_core(request, res):
     start = iso8601.parse_date(request.GET['start'])
     end = iso8601.parse_date(request.GET['end'])
-    res = merged_calendar_core(id)
     events = []
     for event in res.subcomponents:
         if 'dtstart' not in event:
@@ -341,6 +361,10 @@ def merged_calendar_json(request, id):
                 derived['allDay'] = True
             events.append(derived)
     return JsonResponse(events, safe=False, json_dumps_params={"indent": 4})
+
+def merged_calendar_json(request, id):
+    res = merged_calendar_core(id)
+    return calendar_json_core(res)
 
 @needs_login
 @require_POST
