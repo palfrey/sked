@@ -14,4 +14,4 @@ services:
       - OAUTHLIB_INSECURE_TRANSPORT=1
 
   postgres:
-    image: postgres:latest
+    image: postgres:10
