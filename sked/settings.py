@@ -26,7 +26,7 @@ SECRET_KEY = os.environ.get("SECRET_KEY", '9=@sc0f1ig1n&ro#otp42_8#3ci9ytc878h(h
 # Run in debug mode outside of Heroku
 DEBUG = 'DYNO' not in os.environ
 
-ALLOWED_HOSTS = ["localhost", "cal-merge.herokuapp.com", "sked.tevp.net"]
+ALLOWED_HOSTS = ["localhost", "cal-merge.herokuapp.com", "sked.tevp.net", "sked.dokku.tevp.net"]
 
 
 # Application definition
