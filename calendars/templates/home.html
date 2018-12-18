@@ -60,7 +60,8 @@
     $(".delete-button").click(function(event) {
       event.preventDefault();
       var url = $(event.target).data("url");
-      var form = $("<form action=\"" + url + "\" method=\"POST\">{% csrf_token %}</form>");
+      var csrftoken = $("[name=csrfmiddlewaretoken]").val();
+      var form = $("<form action=\"" + url + "\" method=\"POST\"><input type=\"hidden\" name=\"csrfmiddlewaretoken\" value=\"" + csrftoken + " /></form>");
       $(document.body).append(form);
       form.submit();
     });
