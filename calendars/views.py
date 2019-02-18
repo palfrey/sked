@@ -21,6 +21,7 @@ from functools import wraps
 import iso8601
 import dateutil
 import re
+import random
 
 scopes = ['https://www.googleapis.com/auth/userinfo.email',
           'https://www.googleapis.com/auth/userinfo.profile',
@@ -307,6 +308,10 @@ def add_event(cal, event, access_level):
         raise Exception(event)
     cal.add_component(event)
 
+def random_id():
+    hash = random.getrandbits(128)
+    return "%032x" % hash
+
 def add_gcalendar(main_cal, id, access_level, user):
     minTime = (datetime.datetime.now()-datetime.timedelta(days=30)).isoformat() + 'Z'
     maxTime = (datetime.datetime.now()+datetime.timedelta(days=365)).isoformat() + 'Z'
@@ -341,7 +346,7 @@ def add_gcalendar(main_cal, id, access_level, user):
             if 'displayName' in item['organizer']:
                 organiser.params['cn'] = icalendar.vText(item['organizer']['displayName'])
             event.add('organizer', organiser)
-        event['uid'] = item['iCalUID']
+        event['uid'] = "%s-%s" % (item['iCalUID'], random_id())
         add_event(main_cal, event, access_level)
 
 def add_icalendar(main_cal, url, access_level, person):
@@ -354,6 +359,7 @@ def add_icalendar(main_cal, url, access_level, person):
         cache.set(url, ical)
     cal = icalendar.Calendar.from_ical(ical)
     for event in cal.subcomponents:
+        event['uid'] += "-%s" % random_id()
         if person == None:
             add_event(main_cal, event, access_level)
         else:
