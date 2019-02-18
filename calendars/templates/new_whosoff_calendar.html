@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<div class="row">
+ <div class="col s12 m6 offset-m3">
+    <h2>Add calendar from Whosoff</h2>
+    WhosOff does provide iCal feeds, but they're generally for many individuals, so we need to filter down a bit.<br/>
+    The feed url is on the <a href="https://staff.whosoff.com/tools/">Tools page</a> under "Available feeds"
+    <form action="{% url 'add_whosoff_calendar' %}" method="post">
+        {% csrf_token %}
+        {{ form }}
+        <input class="form-control btn btn-primary" type="submit" value="Add calendar" />
+    </form>
+ </div>
+</div>
+{% endblock %}

@@ -6,6 +6,7 @@ from django.contrib import messages
 from django.views.decorators.http import require_POST
 from django.core.cache import cache
 from django.http import HttpResponse, JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 
 import google.oauth2.credentials
 import google_auth_oauthlib.flow
@@ -19,6 +20,7 @@ import datetime
 from functools import wraps
 import iso8601
 import dateutil
+import re
 
 scopes = ['https://www.googleapis.com/auth/userinfo.email',
           'https://www.googleapis.com/auth/userinfo.profile',
@@ -203,6 +205,35 @@ def add_calendar(request, user=None):
     return render(request, "new_calendar.html", {"form": form})
 
 @needs_login
+def add_whosoff_calendar(request, user=None):
+    if request.method == 'POST':
+        form = NewWhosoffCalendarForm(request.POST)
+        if form.is_valid():
+            url = form.cleaned_data['calendar_url']
+            url = url.replace("webcal://", "http://")
+            try:
+                cal = requests.get(url)
+                if cal.status_code == 200:
+                    try:
+                        parsed = icalendar.Calendar.from_ical(cal.text)
+                        new_cal, _ = IcalCalendar.objects.get_or_create(url=url, user=user, defaults={'last_retrieved_at': datetime.datetime.now()})
+                        new_cal.name = parsed.get('X-WR-CALNAME', url)
+                        new_cal.last_retrieved_at = datetime.datetime.now()
+                        new_cal.person = form.cleaned_data['person']
+                        new_cal.save()
+                        messages.success(request, "Calendar '%s' added" % new_cal.name)
+                        return redirect(reverse('home'))
+                    except ValueError:
+                        form.add_error("calendar_url", "Bad iCal file at %s (or possibly not one at all)" % url)
+                else:
+                    form.add_error("calendar_url", "Bad response from %s: %s - %s" % (url, cal.status_code, cal.reason))
+            except:
+                form.add_error("calendar_url", "Error getting %s" % url)
+    else:
+        form = NewWhosoffCalendarForm()
+    return render(request, "new_whosoff_calendar.html", {"form": form})
+
+@needs_login
 def add_merged_calendar(request, user=None):
     if request.method == 'POST':
         form = MergedCalendarForm(request.POST)
@@ -313,7 +344,7 @@ def add_gcalendar(main_cal, id, access_level, user):
         event['uid'] = item['iCalUID']
         add_event(main_cal, event, access_level)
 
-def add_icalendar(main_cal, url, access_level):
+def add_icalendar(main_cal, url, access_level, person):
     ical = cache.get(url)
     if ical == None:
         data = requests.get(url)
@@ -323,7 +354,13 @@ def add_icalendar(main_cal, url, access_level):
         cache.set(url, ical)
     cal = icalendar.Calendar.from_ical(ical)
     for event in cal.subcomponents:
-        add_event(main_cal, event, access_level)
+        if person == None:
+            add_event(main_cal, event, access_level)
+        else:
+            if event['SUMMARY'].startswith(person):
+                actual = re.match("%s\[([^\]]+)\]" % person, event['SUMMARY'])
+                event['SUMMARY'] = actual.groups()[0].strip()
+                add_event(main_cal, event, access_level)
 
 def merged_calendar_core(id):
     mc = get_object_or_404(MergedCalendar, id=id)
@@ -338,7 +375,7 @@ def merged_calendar_core(id):
         if ac.g_calendar != None:
             add_gcalendar(main_cal, ac.g_calendar.id, ac.access_level, mc.user)
         elif ac.i_calendar != None:
-            add_icalendar(main_cal, ac.i_calendar.url, ac.access_level)
+            add_icalendar(main_cal, ac.i_calendar.url, ac.access_level, ac.i_calendar.person)
         else:
             raise Exception(ac)
     return main_cal
@@ -388,7 +425,7 @@ def delete_merged_calendar(request, id, user=None):
     return redirect(reverse('home'))
 
 @needs_login
-@require_POST
+@csrf_exempt # Because we'd need a nested form
 def delete_calendar(request, id, user=None):
     ic = get_object_or_404(IcalCalendar, id=id)
     if ic.user != user:

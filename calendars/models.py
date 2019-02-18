@@ -23,6 +23,7 @@ class IcalCalendar(models.Model):
     url = models.URLField(unique=True)
     user = models.ForeignKey(GoogleUser, on_delete=models.CASCADE, related_name='i_calendars')
     name = models.CharField(max_length=255)
+    person = models.CharField(max_length=255, null=True, blank=True) # only used by WhosOff
     last_retrieved_at = models.DateTimeField()
 
     def __str__(self):
