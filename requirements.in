@@ -8,6 +8,7 @@ google-auth-httplib2
 icalendar
 requests
 iso8601
+python-dateutil
 
 # Heroku
 gunicorn

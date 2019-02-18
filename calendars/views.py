@@ -18,6 +18,7 @@ import icalendar
 import datetime
 from functools import wraps
 import iso8601
+import dateutil
 
 scopes = ['https://www.googleapis.com/auth/userinfo.email',
           'https://www.googleapis.com/auth/userinfo.profile',
@@ -186,7 +187,7 @@ def add_calendar(request, user=None):
                     try:
                         parsed = icalendar.Calendar.from_ical(cal.text)
                         new_cal, _ = IcalCalendar.objects.get_or_create(url=url, user=user, defaults={'last_retrieved_at': datetime.datetime.now()})
-                        new_cal.name = parsed.get('X-WR-CALNAME', "")
+                        new_cal.name = parsed.get('X-WR-CALNAME', url)
                         new_cal.last_retrieved_at = datetime.datetime.now()
                         new_cal.save()
                         messages.success(request, "Calendar '%s' added" % new_cal.name)
@@ -346,18 +347,28 @@ def merged_calendar_view(request, id):
     main_cal = merged_calendar_core(id)
     return HttpResponse(main_cal.to_ical())
 
+def make_datetime(date):
+    if isinstance(date, datetime.datetime):
+        return date
+    elif isinstance(date, datetime.date):
+        tz = dateutil.tz.gettz("Europe/London")
+        return datetime.datetime.combine(date, datetime.time.min, tz)
+    else:
+        raise Exception("Can't convert", date)
+
 def calendar_json_core(request, res):
-    start = iso8601.parse_date(request.GET['start'])
-    end = iso8601.parse_date(request.GET['end'])
+    start = make_datetime(iso8601.parse_date(request.GET['start']))
+    end = make_datetime(iso8601.parse_date(request.GET['end']))
     events = []
     for event in res.subcomponents:
         if 'dtstart' not in event:
             continue
-        if event['dtstart'].dt >= start and event['dtstart'].dt < end:
-            derived = {'start': event['dtstart'].dt, 'end': event['dtend'].dt, 'title': event['summary']}
+        evstart = make_datetime(event['dtstart'].dt)
+        if evstart >= start and evstart < end:
+            derived = {'start': evstart, 'end': event['dtend'].dt, 'title': event['summary']}
             if 'url' in event:
                 derived['url'] = event['url']
-            if event['dtstart'].dt.hour == 0:
+            if evstart.hour == 0:
                 derived['allDay'] = True
             events.append(derived)
     return JsonResponse(events, safe=False, json_dumps_params={"indent": 4})
