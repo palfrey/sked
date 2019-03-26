@@ -279,7 +279,7 @@ def my_calendar_json(request, user=None):
     for gcal in user.g_calendars.all():
         add_gcalendar(res, gcal.id, "yes", user)
     for ical in user.i_calendars.all():
-        add_icalendar(res, ical.url, "yes", user)
+        add_icalendar(res, ical.url, "yes", ical.person)
     return calendar_json_core(request, res)
 
 def date_convert(when):
