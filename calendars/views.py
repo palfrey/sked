@@ -334,9 +334,14 @@ def add_gcalendar(main_cal, id, access_level, user):
         if item['status'] == 'cancelled':
             continue
         event = icalendar.Event()
-        event.add('summary', item['summary'])
-        event.add('dtstart', date_convert(item['start']))
-        event.add('dtend', date_convert(item['end']))
+        try:
+            if 'summary' in item:
+                event.add('summary', item['summary'])
+            event.add('dtstart', date_convert(item['start']))
+            event.add('dtend', date_convert(item['end']))
+        except:
+            print(event)
+            raise
         try:
             event.add('dtstamp', iso8601.parse_date(item['created']))
         except iso8601.ParseError:
