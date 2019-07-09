@@ -364,7 +364,10 @@ def add_icalendar(main_cal, url, access_level, person):
         cache.set(url, ical)
     cal = icalendar.Calendar.from_ical(ical)
     for event in cal.subcomponents:
-        event['uid'] += "-%s" % random_id()
+        if 'uid' in event:
+            event['uid'] += "-%s" % random_id()
+        else:
+            event['uid'] = random_id()
         if person == None:
             add_event(main_cal, event, access_level)
         else:
