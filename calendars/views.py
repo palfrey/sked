@@ -351,6 +351,8 @@ def add_gcalendar(main_cal, id, access_level, user):
             if 'displayName' in item['organizer']:
                 organiser.params['cn'] = icalendar.vText(item['organizer']['displayName'])
             event.add('organizer', organiser)
+        if 'location' in item:
+            event['location'] = item['location']
         event['uid'] = "%s-%s" % (item['iCalUID'], random_id())
         add_event(main_cal, event, access_level)
 
