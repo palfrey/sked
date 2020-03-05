@@ -1,6 +1,6 @@
 django ~= 2.2
 dj-database-url
-psycopg2
+psycopg2-binary
 google-api-python-client
 google-auth
 google-auth-oauthlib
