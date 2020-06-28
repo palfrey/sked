@@ -189,7 +189,7 @@ def add_calendar(request, user=None):
                 if cal.status_code == 200:
                     try:
                         parsed = icalendar.Calendar.from_ical(cal.text)
-                        new_cal, _ = IcalCalendar.objects.get_or_create(url=url, user=user, defaults={'last_retrieved_at': datetime.datetime.now()})
+                        new_cal, _ = IcalCalendar.objects.get_or_create(url=url, user=user, defaults={'last_retrieved_at': datetime.datetime.now(), 'icalType': IcalType.GENERIC})
                         new_cal.name = parsed.get('X-WR-CALNAME', url)
                         new_cal.last_retrieved_at = datetime.datetime.now()
                         new_cal.save()
@@ -217,7 +217,7 @@ def add_whosoff_calendar(request, user=None):
                 if cal.status_code == 200:
                     try:
                         parsed = icalendar.Calendar.from_ical(cal.text)
-                        new_cal, _ = IcalCalendar.objects.get_or_create(url=url, user=user, defaults={'last_retrieved_at': datetime.datetime.now()})
+                        new_cal, _ = IcalCalendar.objects.get_or_create(url=url, user=user, defaults={'last_retrieved_at': datetime.datetime.now(), 'icalType': IcalType.WHOSOFF})
                         new_cal.name = parsed.get('X-WR-CALNAME', url)
                         new_cal.last_retrieved_at = datetime.datetime.now()
                         new_cal.person = form.cleaned_data['person']

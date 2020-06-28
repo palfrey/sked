@@ -1,6 +1,7 @@
 from django.db import models
 import datetime
 import uuid
+from enum import Enum
 
 class GoogleUser(models.Model):
     email = models.EmailField(primary_key=True)
@@ -18,6 +19,11 @@ class GoogleCalendar(models.Model):
     def __str__(self):
         return self.name
 
+class IcalType(Enum):
+    GENERIC = "Generic"
+    WHOSOFF = "WhosOff"
+    BAMBOO = "BambooHR"
+
 class IcalCalendar(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     url = models.URLField(unique=True)
@@ -25,6 +31,10 @@ class IcalCalendar(models.Model):
     name = models.CharField(max_length=255)
     person = models.CharField(max_length=255, null=True, blank=True) # only used by WhosOff
     last_retrieved_at = models.DateTimeField()
+    icalType = models.CharField(
+        max_length=7,
+        choices=[(tag, tag.value) for tag in IcalType],
+    )
 
     def __str__(self):
         return self.name
