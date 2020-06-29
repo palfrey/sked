@@ -14,6 +14,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='icalcalendar',
             name='icalType',
-            field=models.CharField(choices=[(calendars.models.IcalType('Generic'), 'Generic'), (calendars.models.IcalType('WhosOff'), 'WhosOff'), (calendars.models.IcalType('BambooHR'), 'BambooHR')], max_length=7, null=True),
+            field=models.CharField(choices=[(calendars.models.IcalType('Generic'), 'Generic'), (calendars.models.IcalType('WhosOff'), 'WhosOff'), (calendars.models.IcalType('BambooHR'), 'BambooHR')], max_length=32, null=True),
         ),
     ]

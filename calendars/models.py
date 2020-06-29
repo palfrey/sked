@@ -33,7 +33,7 @@ class IcalCalendar(models.Model):
     last_retrieved_at = models.DateTimeField()
     icalType = models.CharField(
         max_length=32,
-        choices=[(tag, tag.value) for tag in IcalType],
+        choices=[(str(tag), tag.value) for tag in IcalType],
     )
 
     def __str__(self):

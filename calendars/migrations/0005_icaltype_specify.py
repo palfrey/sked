@@ -11,9 +11,9 @@ def gen_icalType(apps, schema_editor):
     IcalCalendar = apps.get_model('calendars', 'IcalCalendar')
     for row in IcalCalendar.objects.all():
         if row.person == None:
-            row.icalType = IcalType.GENERIC
+            row.icalType = str(IcalType.GENERIC)
         else:
-            row.icalType = IcalType.WHOSOFF
+            row.icalType = str(IcalType.WHOSOFF)
         row.save(update_fields=['icalType'])
 
 
