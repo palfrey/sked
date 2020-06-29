@@ -53,6 +53,10 @@
                         <li class="nav-item">
                             <a class="nav-link{% if request.path == calendar_url %} active{% endif %}" href="{% url 'add_whosoff_calendar' %}">Add WhosOff calendar</a>
                         </li>
+                        {% url 'add_bamboo_calendar' as calendar_url %}
+                        <li class="nav-item">
+                            <a class="nav-link{% if request.path == calendar_url %} active{% endif %}" href="{% url 'add_bamboo_calendar' %}">Add Bamboo calendar</a>
+                        </li>
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'refresh_gcalendars' %}">Refresh Google Calendar list</a>
                         </li>

@@ -235,6 +235,34 @@ def add_whosoff_calendar(request, user=None):
     return render(request, "new_whosoff_calendar.html", {"form": form})
 
 @needs_login
+def add_bamboo_calendar(request, user=None):
+    if request.method == 'POST':
+        form = NewBambooCalendarForm(request.POST)
+        if form.is_valid():
+            url = form.cleaned_data['calendar_url']
+            try:
+                cal = requests.get(url)
+                if cal.status_code == 200:
+                    try:
+                        parsed = icalendar.Calendar.from_ical(cal.text)
+                        new_cal, _ = IcalCalendar.objects.get_or_create(url=url, user=user, defaults={'last_retrieved_at': datetime.datetime.now(), 'icalType': IcalType.BAMBOO})
+                        new_cal.name = parsed.get('X-WR-CALNAME', url)
+                        new_cal.last_retrieved_at = datetime.datetime.now()
+                        new_cal.person = form.cleaned_data['person']
+                        new_cal.save()
+                        messages.success(request, "Calendar '%s' added" % new_cal.name)
+                        return redirect(reverse('home'))
+                    except ValueError:
+                        form.add_error("calendar_url", "Bad iCal file at %s (or possibly not one at all)" % url)
+                else:
+                    form.add_error("calendar_url", "Bad response from %s: %s - %s" % (url, cal.status_code, cal.reason))
+            except:
+                form.add_error("calendar_url", "Error getting %s" % url)
+    else:
+        form = NewBambooCalendarForm()
+    return render(request, "new_bamboo_calendar.html", {"form": form})
+
+@needs_login
 def add_merged_calendar(request, user=None):
     if request.method == 'POST':
         form = MergedCalendarForm(request.POST)
@@ -279,7 +307,7 @@ def my_calendar_json(request, user=None):
     for gcal in user.g_calendars.all():
         add_gcalendar(res, gcal.id, "yes", user)
     for ical in user.i_calendars.all():
-        add_icalendar(res, ical.url, "yes", ical.person)
+        add_icalendar(res, ical.url, "yes", ical)
     return calendar_json_core(request, res)
 
 def date_convert(when):
@@ -342,10 +370,11 @@ def add_gcalendar(main_cal, id, access_level, user):
         except:
             print(event)
             raise
-        try:
-            event.add('dtstamp', iso8601.parse_date(item['created']))
-        except iso8601.ParseError:
-            pass
+        if 'created' in item:
+            try:
+                event.add('dtstamp', iso8601.parse_date(item['created']))
+            except iso8601.ParseError:
+                pass
         if 'organizer' in item:
             organiser = icalendar.vCalAddress(item['organizer']['email'])
             if 'displayName' in item['organizer']:
@@ -356,11 +385,12 @@ def add_gcalendar(main_cal, id, access_level, user):
         event['uid'] = "%s-%s" % (item['iCalUID'], random_id())
         add_event(main_cal, event, access_level)
 
-def add_icalendar(main_cal, url, access_level, person):
+def add_icalendar(main_cal, url, access_level, icalObj):
     ical = cache.get(url)
     if ical == None:
         data = requests.get(url)
         if not data.ok:
+            data.raise_for_status()
             return
         ical = data.text
         cache.set(url, ical)
@@ -370,13 +400,26 @@ def add_icalendar(main_cal, url, access_level, person):
             event['uid'] += "-%s" % random_id()
         else:
             event['uid'] = random_id()
-        if person == None:
+        if icalObj.icalType == str(IcalType.GENERIC):
             add_event(main_cal, event, access_level)
-        else:
-            if event['SUMMARY'].startswith(person):
-                actual = re.match("%s\[([^\]]+)\]" % person, event['SUMMARY'])
+        elif icalObj.icalType == str(IcalType.WHOSOFF):
+            if event['SUMMARY'].startswith(icalObj.person):
+                actual = re.match("%s\[([^\]]+)\]" % icalObj.person, event['SUMMARY'])
                 event['SUMMARY'] = actual.groups()[0].strip()
                 add_event(main_cal, event, access_level)
+        elif icalObj.icalType == str(IcalType.BAMBOO):
+            if event['SUMMARY'].startswith(icalObj.person):
+                actual = re.match("%s \(([^-]+) - .+\)" % icalObj.person, event['SUMMARY']).groups()
+                kind = actual[0]
+                if kind == "Working from Home":
+                    event['SUMMARY'] = 'WFH'
+                elif kind.startswith("Annual Leave"):
+                    event['SUMMARY'] = 'Holiday'
+                else:
+                    event['SUMMARY'] = kind
+                add_event(main_cal, event, access_level)
+        else:
+            raise Exception(icalObj.icalType)
 
 def merged_calendar_core(id):
     mc = get_object_or_404(MergedCalendar, id=id)
@@ -391,7 +434,7 @@ def merged_calendar_core(id):
         if ac.g_calendar != None:
             add_gcalendar(main_cal, ac.g_calendar.id, ac.access_level, mc.user)
         elif ac.i_calendar != None:
-            add_icalendar(main_cal, ac.i_calendar.url, ac.access_level, ac.i_calendar.person)
+            add_icalendar(main_cal, ac.i_calendar.url, ac.access_level, ac.i_calendar)
         else:
             raise Exception(ac)
     return main_cal
@@ -418,7 +461,9 @@ def calendar_json_core(request, res):
             continue
         evstart = make_datetime(event['dtstart'].dt)
         if evstart >= start and evstart < end:
-            derived = {'start': evstart, 'end': event['dtend'].dt, 'title': event['summary']}
+            derived = {'start': evstart, 'end': event['dtend'].dt}
+            if 'summary' in event:
+                derived['title'] = event['summary']
             if 'url' in event:
                 derived['url'] = event['url']
             if evstart.hour == 0:

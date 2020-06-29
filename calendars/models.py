@@ -32,7 +32,7 @@ class IcalCalendar(models.Model):
     person = models.CharField(max_length=255, null=True, blank=True) # only used by WhosOff
     last_retrieved_at = models.DateTimeField()
     icalType = models.CharField(
-        max_length=7,
+        max_length=32,
         choices=[(tag, tag.value) for tag in IcalType],
     )
 
