@@ -412,6 +412,9 @@ def add_icalendar(main_cal, url, access_level, icalObj):
                 actual = re.match("%s \(([^-]+) - .+\)" % icalObj.person, event['SUMMARY']).groups()
                 kind = actual[0]
                 if kind == "Working from Home":
+                    length = event['DTEND'].dt-event['DTSTART'].dt
+                    if length > datetime.timedelta(days=10):
+                        continue
                     event['SUMMARY'] = 'WFH'
                 elif kind.startswith("Annual Leave"):
                     event['SUMMARY'] = 'Holiday'
