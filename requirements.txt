@@ -70,7 +70,7 @@ requests==2.20.1
     # via
     #   -r requirements.in
     #   requests-oauthlib
-rsa==4.1
+rsa==4.7
     # via google-auth
 six==1.11.0
     # via
