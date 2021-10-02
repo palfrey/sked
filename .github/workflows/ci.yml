@@ -12,4 +12,4 @@ jobs:
       - name: Build the stack
         run: docker-compose up --build -d
       - name: Test
-        run: ./wait-for-host.sh localhost:8000 200 20 && curl --verbose --retry 10 http://localhost:8000/
+        run: ./wait-for-it.sh localhost:8000 --timeout=120 --strict -- curl --verbose --retry 10 http://localhost:8000/
