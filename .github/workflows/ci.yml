@@ -9,6 +9,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - name: Copy settings
+      - run: cp sked/settings_private_example.py sked/settings_private.py
       - name: Build the stack
         run: docker-compose up --build -d
       - name: Test
