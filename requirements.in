@@ -1,4 +1,4 @@
-django ~= 2.2
+django
 dj-database-url
 psycopg2-binary
 google-api-python-client

@@ -27,5 +27,6 @@ The Docker build is the best option, but here's how to do it without
     * `export OAUTHLIB_INSECURE_TRANSPORT=1`
 2. Do steps 2-4 of "Local development" to setup Google auth
 3. `python manage.py migrate`
-4. `python manage.py runserver 0.0.0.0:8000`
-5. Goto [http://localhost:8000](http://localhost:8000)
+4. `python manage.py createcachetable`
+5. `python manage.py runserver 0.0.0.0:8000`
+6. Goto [http://localhost:8000](http://localhost:8000)

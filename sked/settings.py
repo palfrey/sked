@@ -26,7 +26,7 @@ SECRET_KEY = os.environ.get("SECRET_KEY", '9=@sc0f1ig1n&ro#otp42_8#3ci9ytc878h(h
 # Run in debug mode outside of Heroku
 DEBUG = 'DYNO' not in os.environ
 
-ALLOWED_HOSTS = ["localhost", "cal-merge.herokuapp.com", "sked.tevp.net", "sked.dokku.tevp.net"]
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", "0.0.0.0", "sked.tevp.net", "sked.dokku.tevp.net"]
 
 
 # Application definition
@@ -126,11 +126,8 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
 STATICFILES_DIRS = [os.path.join(BASE_DIR, "calendars", "static")]
 
-try:
-    from .settings_private import *
-except ModuleNotFoundError:
-    GOOGLE_OAUTH2_KEY = os.environ["GOOGLE_OAUTH2_KEY"]
-    GOOGLE_OAUTH2_SECRET = os.environ["GOOGLE_OAUTH2_SECRET"]
+GOOGLE_OAUTH2_KEY = os.environ["GOOGLE_OAUTH2_KEY"]
+GOOGLE_OAUTH2_SECRET = os.environ["GOOGLE_OAUTH2_SECRET"]
 
 LOGGING = {
     'version': 1,

@@ -1,6 +1,6 @@
 .vscode/
 /static/
-ENV/
 *.pyc
 *.db
-.DS_Store
+.env
+.downloads/

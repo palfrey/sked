@@ -1,4 +1,4 @@
-FROM python:3.8
+FROM python:3.12
 
 # So dbshell works
 RUN apt-get update && apt-get install -y postgresql-client

@@ -1,3 +1,4 @@
+from typing import Optional
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import logout
 from django.conf import settings
@@ -5,7 +6,7 @@ from django.urls import reverse
 from django.contrib import messages
 from django.views.decorators.http import require_POST
 from django.core.cache import cache
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
 import google.oauth2.credentials
@@ -22,18 +23,19 @@ import iso8601
 import dateutil
 import re
 import random
+from django.contrib.auth.models import User
 
-scopes = ['https://www.googleapis.com/auth/userinfo.email',
+scopes = ['openid','https://www.googleapis.com/auth/userinfo.email',
           'https://www.googleapis.com/auth/userinfo.profile',
           'https://www.googleapis.com/auth/calendar.readonly']
 
-def about_sked(request):
+def about_sked(request: HttpRequest):
     return render(request, 'about_sked.html')
 
-def guide(request):
+def guide(request: HttpRequest):
     return render(request, 'guide.html')
 
-def make_flow(request):
+def make_flow(request: HttpRequest):
     callback = request.build_absolute_uri(reverse('oauth2callback'))
     oauth_config = {'web': {
                     'client_id': settings.GOOGLE_OAUTH2_KEY,
@@ -60,7 +62,7 @@ class Redirect(Exception):
     def __init__(self, url):
         self.url = url
 
-def get_user(request):
+def get_user(request: HttpRequest):
     email = request.session.get("email", None)
     if email is not None:
         try:
@@ -72,7 +74,7 @@ def get_user(request):
         return None
 
 def needs_login(view_func):
-    def _decorator(request, *args, **kwargs):
+    def _decorator(request: HttpRequest, *args, **kwargs):
         try:
             user = get_user(request)
         except Redirect as r:
@@ -84,7 +86,7 @@ def needs_login(view_func):
         return response
     return wraps(view_func)(_decorator)
 
-def home(request):
+def home(request: HttpRequest):
     try:
         user = get_user(request)
     except Redirect as r:
@@ -106,7 +108,7 @@ def home(request):
         data = {'user': None, 'auth_url': authorization_url}
     return render(request, 'home.html', data)
 
-def update_access_core(request, user):
+def update_access_core(request: HttpRequest, user: GoogleUser):
     for mc in user.m_calendars.all():
         for ac in mc.access.all():
             if str(ac.id) in request.POST:
@@ -120,7 +122,7 @@ def update_access(request, user=None):
     return redirect(reverse('home'))
 
 @needs_login
-def update_access_merged(request, id, user=None):
+def update_access_merged(request: HttpRequest, id, user=None):
     update_access_core(request, user)
     return redirect(reverse('merged_calendar', args=[id]))
 
@@ -130,7 +132,7 @@ def get_gcalendars(credentials):
         credentials=credentials)
     return calendar_service.calendarList().list(minAccessRole="reader").execute()['items']
 
-def oauth2callback(request):
+def oauth2callback(request: HttpRequest):
     state = request.session['state']
     flow = make_flow(request)
     flow.state = state
@@ -159,7 +161,7 @@ def oauth2callback(request):
     return redirect(reverse('home'))
 
 @needs_login
-def refresh_gcalendars(request, user=None):
+def refresh_gcalendars(request: HttpRequest, user: Optional[User]=None):
     credentials = make_credentials(user)
     calendars = get_gcalendars(credentials)
     existing_calendars = dict([(cal.id, cal) for cal in user.g_calendars.all()])
@@ -178,7 +180,7 @@ def refresh_gcalendars(request, user=None):
     return redirect(reverse('home'))
 
 @needs_login
-def add_calendar(request, user=None):
+def add_calendar(request: HttpRequest, user=None):
     if request.method == 'POST':
         form = NewCalendarForm(request.POST)
         if form.is_valid():
@@ -206,7 +208,7 @@ def add_calendar(request, user=None):
     return render(request, "new_calendar.html", {"form": form})
 
 @needs_login
-def add_whosoff_calendar(request, user=None):
+def add_whosoff_calendar(request: HttpRequest, user: Optional[GoogleUser]=None):
     if request.method == 'POST':
         form = NewWhosoffCalendarForm(request.POST)
         if form.is_valid():
@@ -235,7 +237,7 @@ def add_whosoff_calendar(request, user=None):
     return render(request, "new_whosoff_calendar.html", {"form": form})
 
 @needs_login
-def add_bamboo_calendar(request, user=None):
+def add_bamboo_calendar(request: HttpRequest, user: Optional[GoogleUser]=None):
     if request.method == 'POST':
         form = NewBambooCalendarForm(request.POST)
         if form.is_valid():
@@ -263,7 +265,7 @@ def add_bamboo_calendar(request, user=None):
     return render(request, "new_bamboo_calendar.html", {"form": form})
 
 @needs_login
-def add_merged_calendar(request, user=None):
+def add_merged_calendar(request: HttpRequest, user: Optional[GoogleUser]=None):
     if request.method == 'POST':
         form = MergedCalendarForm(request.POST)
         if form.is_valid():
@@ -280,7 +282,7 @@ def add_merged_calendar(request, user=None):
     return render(request, "new_merged_calendar.html", {"form": form})
 
 @needs_login
-def merged_calendar(request, id, user=None):
+def merged_calendar(request: HttpRequest, id: str, user: Optional[GoogleUser]=None):
     mc = get_object_or_404(MergedCalendar, id=id)
     if mc.user != user:
         return redirect(reverse('home'))
@@ -295,11 +297,11 @@ def merged_calendar(request, id, user=None):
     return render(request, "merged_calendar.html", {"user": user, "mc": mc, "form": form, "url": request.build_absolute_uri(reverse("merged_calendar_view", args=[mc.id]))})
 
 @needs_login
-def my_calendar(request, user=None):
+def my_calendar(request: HttpRequest, user: Optional[GoogleUser]=None):
     return render(request, "my_calendar.html", {"user": user})
 
 @needs_login
-def my_calendar_json(request, user=None):
+def my_calendar_json(request: HttpRequest, user: Optional[GoogleUser]=None):
     res = icalendar.Calendar()
     res.add('prodid', '-//Sked//')
     res.add('version', '2.0')
@@ -310,7 +312,7 @@ def my_calendar_json(request, user=None):
         add_icalendar(res, ical.url, "yes", ical)
     return calendar_json_core(request, res)
 
-def date_convert(when):
+def date_convert(when: dict):
     if 'dateTime' in when:
         return icalendar.vDatetime(iso8601.parse_date(when['dateTime']))
     elif 'date' in when:
@@ -424,7 +426,7 @@ def add_icalendar(main_cal, url, access_level, icalObj):
         else:
             raise Exception(icalObj.icalType)
 
-def merged_calendar_core(id):
+def merged_calendar_core(id: uuid.UUID):
     mc = get_object_or_404(MergedCalendar, id=id)
     main_cal = icalendar.Calendar()
     main_cal.add('prodid', '-//Sked//')
@@ -442,7 +444,7 @@ def merged_calendar_core(id):
             raise Exception(ac)
     return main_cal
 
-def merged_calendar_view(request, id):
+def merged_calendar_view(request: HttpRequest, id):
     main_cal = merged_calendar_core(id)
     return HttpResponse(main_cal.to_ical())
 
@@ -455,7 +457,7 @@ def make_datetime(date):
     else:
         raise Exception("Can't convert", date)
 
-def calendar_json_core(request, res):
+def calendar_json_core(request: HttpRequest, res):
     start = make_datetime(iso8601.parse_date(request.GET['start']))
     end = make_datetime(iso8601.parse_date(request.GET['end']))
     events = []
@@ -474,13 +476,13 @@ def calendar_json_core(request, res):
             events.append(derived)
     return JsonResponse(events, safe=False, json_dumps_params={"indent": 4})
 
-def merged_calendar_json(request, id):
+def merged_calendar_json(request: HttpRequest, id):
     res = merged_calendar_core(id)
     return calendar_json_core(request, res)
 
 @needs_login
 @require_POST
-def delete_merged_calendar(request, id, user=None):
+def delete_merged_calendar(request: HttpRequest, id, user=None):
     mc = get_object_or_404(MergedCalendar, id=id)
     if mc.user != user:
         return redirect(reverse('home'))
@@ -490,7 +492,7 @@ def delete_merged_calendar(request, id, user=None):
 
 @needs_login
 @csrf_exempt # Because we'd need a nested form
-def delete_calendar(request, id, user=None):
+def delete_calendar(request: HttpRequest, id, user=None):
     ic = get_object_or_404(IcalCalendar, id=id)
     if ic.user != user:
         return redirect(reverse('home'))
@@ -498,6 +500,6 @@ def delete_calendar(request, id, user=None):
     messages.success(request, "Deleted '%s'" % ic.name)
     return redirect(reverse('home'))
 
-def logout(request):
+def logout(request: HttpRequest):
     del request.session["email"]
     return redirect(reverse('home'))
