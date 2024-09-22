@@ -4,15 +4,23 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('calendars', '0001_initial'),
+        ("calendars", "0001_initial"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='calendaraccess',
-            name='access_level',
-            field=models.CharField(choices=[('no', 'No'), ('busy', 'Busy'), ('yes', 'Yes'), ('alld', 'All-day events only')], default='no', max_length=4),
+            model_name="calendaraccess",
+            name="access_level",
+            field=models.CharField(
+                choices=[
+                    ("no", "No"),
+                    ("busy", "Busy"),
+                    ("yes", "Yes"),
+                    ("alld", "All-day events only"),
+                ],
+                default="no",
+                max_length=4,
+            ),
         ),
     ]

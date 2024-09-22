@@ -1,0 +1,55 @@
+---
+repos:
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: v2.4.0
+  hooks:
+  - id: trailing-whitespace
+    exclude_types: [yaml]
+  - id: end-of-file-fixer
+  - id: check-yaml
+  - id: check-added-large-files
+
+- repo: https://github.com/jumanjihouse/pre-commit-hook-yamlfmt
+  rev: 0.2.3
+  hooks:
+  - id: yamlfmt
+    args: [--mapping, '2', --offset, '0', --sequence, '2']
+    exclude: pnpm-lock.yaml
+
+- repo: https://github.com/macisamuele/language-formatters-pre-commit-hooks
+  rev: v2.14.0
+  hooks:
+  - id: pretty-format-toml
+    args: [--autofix]
+
+- repo: https://github.com/astral-sh/ruff-pre-commit
+  rev: v0.6.7
+  hooks:
+  - id: ruff
+    args: [--fix]
+  - id: ruff-format
+
+- repo: https://github.com/PyCQA/isort
+  rev: 5.12.0
+  hooks:
+  - id: isort
+    args: [--profile, black]
+
+- repo: https://github.com/psf/black
+  rev: 23.1.0
+  hooks:
+  - id: black
+
+- repo: local
+  hooks:
+  - id: uv
+    name: uv
+    language: system
+    entry: make requirements.txt
+    files: requirements.*
+
+  - id: mypy
+    name: mypy
+    language: system
+    entry: make mypy
+    types: [python]
