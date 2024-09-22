@@ -3,7 +3,7 @@ set -eu -o pipefail
 
 SCRIPT_FOLDER=$(dirname $(realpath $0))
 
-VERSION=0.2.33
+VERSION=0.4.15
 DOWNLOADS=${SCRIPT_FOLDER}/.downloads
 UV=${DOWNLOADS}/uv-${VERSION}
 UV_COMPRESSED=${DOWNLOADS}/uv-${VERSION}.tar.gz
