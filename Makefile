@@ -11,3 +11,12 @@ sync: requirements.txt .venv/bin/activate
 .PHONY: pre-commit
 pre-commit: sync
 	./uv run pre-commit run -a
+
+mypy: sync
+	MYPYPATH=stubs ./uv run mypy --explicit-package-bases sked calendars
+
+mypy-daemon: sync
+	MYPYPATH=stubs ./uv run dmypy run -- --explicit-package-bases sked calendars
+
+watch-mypy: sync
+	 ./uv run watchmedo auto-restart -d sked -d calendars --pattern="*.py;*.pyi" --recursive -- ${MAKE} mypy-daemon

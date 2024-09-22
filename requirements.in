@@ -9,10 +9,12 @@ icalendar
 requests
 iso8601
 python-dateutil
-
-# Heroku
 gunicorn
 whitenoise
+pre-commit
+watchdog[watchmedo]==2.1.7
 
-# Managing this file
-pip-tools
+django-stubs
+mypy
+types-python-dateutil
+types-requests

@@ -1,20 +1,25 @@
+---
 name: CI
 on:
   push:
     branches:
-      - master
+    - master
   pull_request:
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+      GOOGLE_OAUTH2_KEY: dummy-key
+      GOOGLE_OAUTH2_SECRET: dummy-secret
+      OAUTHLIB_INSECURE_TRANSPORT: 1
+      DATABASE_URL: sqlite:///sked.db
     steps:
-      - uses: actions/checkout@v2
-      - name: Copy settings
-        run: cp sked/settings_private_example.py sked/settings_private.py
-      - name: Build the stack
-        run: docker-compose up --build -d
-      - name: Test
-        run: ./wait-for-host.sh localhost:8000 200 60 && curl --verbose --retry 10 http://localhost:8000/
-      - name: Log on failure
-        if: ${{ failure() }}
-        run: docker-compose logs
+    - uses: actions/checkout@v2
+    - run: make pre-commit
+    - name: Build the stack
+      run: docker compose up --build -d
+    - name: Test
+      run: ./wait-for-host.sh localhost:8000 200 60 && curl --verbose --retry 10 http://localhost:8000/
+    - name: Log on failure
+      if: ${{ failure() }}
+      run: docker compose logs

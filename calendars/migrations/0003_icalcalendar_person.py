@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('calendars', '0002_add_all_day'),
+        ("calendars", "0002_add_all_day"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='icalcalendar',
-            name='person',
+            model_name="icalcalendar",
+            name="person",
             field=models.CharField(blank=True, max_length=255, null=True),
         ),
     ]

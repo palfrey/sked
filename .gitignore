@@ -4,3 +4,5 @@
 *.db
 .env
 .downloads/
+sked.egg-info/
+.dmypy.json
