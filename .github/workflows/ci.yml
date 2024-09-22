@@ -8,6 +8,11 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+      GOOGLE_OAUTH2_KEY: dummy-key
+      GOOGLE_OAUTH2_SECRET: dummy-secret
+      OAUTHLIB_INSECURE_TRANSPORT: 1
+      DATABASE_URL: sqlite:///sked.db
     steps:
     - uses: actions/checkout@v2
     - run: make pre-commit
