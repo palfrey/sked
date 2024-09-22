@@ -12,7 +12,11 @@ services:
     - .:/work
     restart: on-failure
     environment:
-    - OAUTHLIB_INSECURE_TRANSPORT=1
+      GOOGLE_OAUTH2_KEY: ${GOOGLE_OAUTH2_KEY:-dummy-key}
+      GOOGLE_OAUTH2_SECRET: ${GOOGLE_OAUTH2_SECRET:-dummy-secret}
+      OAUTHLIB_INSECURE_TRANSPORT: 1
 
   postgres:
-    image: postgres:10.11
+    image: postgres:15
+    environment:
+      POSTGRES_PASSWORD: postgres
