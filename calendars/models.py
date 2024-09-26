@@ -12,6 +12,8 @@ class GoogleUser(models.Model):
     name = models.CharField(max_length=255)
     calendars_retrieved_at = models.DateTimeField(default=datetime.datetime.min)
 
+    is_authenticated = True
+
 
 class GoogleCalendar(models.Model):
     id = models.CharField(primary_key=True, max_length=255)
