@@ -29,6 +29,9 @@ SECRET_KEY = os.environ.get(
 # Run in debug mode outside of Heroku
 DEBUG = "DYNO" not in os.environ
 
+USE_X_FORWARDED_HOST = True
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
 ALLOWED_HOSTS = [
     "localhost",
     "127.0.0.1",
