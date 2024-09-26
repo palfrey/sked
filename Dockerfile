@@ -8,4 +8,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 WORKDIR /work
 COPY . /work
 ENV OAUTHLIB_RELAX_TOKEN_SCOPE=1
-CMD bash -c "python3 manage.py migrate && python3 manage.py createcachetable && python3 manage.py runserver 0.0.0.0:8000"
+ENV PYTHONUNBUFFERED=1
+EXPOSE 8000
+CMD bash -c "python manage.py migrate && python manage.py createcachetable && python manage.py runserver 0.0.0.0:8000"
