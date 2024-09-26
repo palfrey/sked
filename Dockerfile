@@ -7,6 +7,7 @@ COPY requirements.txt requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 WORKDIR /work
 COPY . /work
+RUN GOOGLE_OAUTH2_KEY=key GOOGLE_OAUTH2_SECRET=secret python manage.py collectstatic
 ENV OAUTHLIB_RELAX_TOKEN_SCOPE=1
 ENV PYTHONUNBUFFERED=1
 EXPOSE 8000
