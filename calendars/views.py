@@ -16,7 +16,8 @@ from django.conf import settings
 from django.contrib import messages
 from django.core.cache import cache
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect, JsonResponse
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import render as django_render
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
@@ -36,6 +37,16 @@ scopes = [
     "https://www.googleapis.com/auth/userinfo.profile",
     "https://www.googleapis.com/auth/calendar.readonly",
 ]
+
+
+def render(
+    request: HttpRequest, template: str, data: Optional[dict] = None
+) -> HttpResponse:
+    if data is None:
+        data = {}
+    if "user" not in data:
+        data["user"] = get_user(request)
+    return django_render(request, template, data)
 
 
 def about_sked(request: HttpRequest) -> HttpResponse:
