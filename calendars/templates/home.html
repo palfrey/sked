@@ -51,6 +51,7 @@
   {% endif %}
  </div>
 </div>
+{% if user is not None %}
 <script>
   document.addEventListener("DOMContentLoaded", function(event) {
     $(".access-view").change(function(event){
@@ -67,4 +68,5 @@
     });
   });
 </script>
+{% endif %}
 {% endblock %}
