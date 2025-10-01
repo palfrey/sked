@@ -16,7 +16,7 @@ distlib==0.3.8
     # via virtualenv
 dj-database-url==2.2.0
     # via -r requirements.in
-django==5.1.4
+django==5.1.13
     # via
     #   -r requirements.in
     #   dj-database-url
@@ -77,7 +77,7 @@ pre-commit==3.8.0
     # via -r requirements.in
 proto-plus==1.24.0
     # via google-api-core
-protobuf==5.28.2
+protobuf==5.29.5
     # via
     #   google-api-core
     #   googleapis-common-protos
@@ -102,7 +102,7 @@ pyyaml==6.0.2
     # via
     #   pre-commit
     #   watchdog
-requests==2.32.3
+requests==2.32.4
     # via
     #   -r requirements.in
     #   google-api-core
@@ -129,7 +129,7 @@ typing-extensions==4.12.2
     #   mypy
 uritemplate==4.1.1
     # via google-api-python-client
-urllib3==2.2.3
+urllib3==2.5.0
     # via
     #   requests
     #   types-requests
