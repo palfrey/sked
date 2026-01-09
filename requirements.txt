@@ -129,7 +129,7 @@ typing-extensions==4.12.2
     #   mypy
 uritemplate==4.1.1
     # via google-api-python-client
-urllib3==2.2.3
+urllib3==2.6.3
     # via
     #   requests
     #   types-requests
