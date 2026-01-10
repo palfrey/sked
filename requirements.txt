@@ -96,7 +96,7 @@ python-dateutil==2.9.0.post0
     # via
     #   -r requirements.in
     #   icalendar
-pytz==2024.2
+pytz==2025.2
     # via icalendar
 pyyaml==6.0.2
     # via
