@@ -4,7 +4,7 @@ asgiref==3.8.1
     # via
     #   django
     #   django-stubs
-cachetools==5.5.0
+cachetools==6.2.4
     # via google-auth
 certifi==2026.1.4
     # via requests
