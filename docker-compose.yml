@@ -19,6 +19,6 @@ services:
       OAUTHLIB_INSECURE_TRANSPORT: 1
 
   postgres:
-    image: postgres:15
+    image: postgres:18
     environment:
       POSTGRES_PASSWORD: postgres
