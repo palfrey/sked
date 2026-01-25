@@ -1,5 +1,5 @@
-requirements.txt: requirements.in
-	./uv pip compile --python-version 3.12.2 --no-strip-extras requirements.in -o requirements.txt
+requirements.txt: requirements.in constraints.txt
+	./uv pip compile --python-version 3.12.2 --no-strip-extras requirements.in -o requirements.txt --constraint constraints.txt
 
 .venv/bin/activate:
 	./uv venv
