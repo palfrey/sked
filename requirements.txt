@@ -51,7 +51,7 @@ httplib2==0.22.0
     # via
     #   google-api-python-client
     #   google-auth-httplib2
-icalendar==6.3.2
+icalendar==7.0.0
     # via -r requirements.in
 identify==2.6.1
     # via pre-commit
