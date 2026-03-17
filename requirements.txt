@@ -82,7 +82,7 @@ protobuf==5.29.6
     #   proto-plus
 psycopg2-binary==2.9.9
     # via -r requirements.in
-pyasn1==0.6.2
+pyasn1==0.6.3
     # via
     #   pyasn1-modules
     #   rsa
