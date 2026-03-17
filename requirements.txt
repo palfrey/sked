@@ -20,7 +20,7 @@ django==5.1.15
     #   dj-database-url
     #   django-stubs
     #   django-stubs-ext
-django-stubs==5.0.4
+django-stubs==6.0.0
     # via -r requirements.in
 django-stubs-ext==6.0.0
     # via django-stubs
