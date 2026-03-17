@@ -22,7 +22,7 @@ django==5.1.15
     #   django-stubs-ext
 django-stubs==5.0.4
     # via -r requirements.in
-django-stubs-ext==5.0.4
+django-stubs-ext==6.0.0
     # via django-stubs
 filelock==3.20.3
     # via virtualenv
