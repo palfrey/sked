@@ -132,7 +132,7 @@ urllib3==2.6.3
     #   types-requests
 virtualenv==20.36.1
     # via pre-commit
-watchdog[watchmedo]==2.1.7
+watchdog[watchmedo]==6.0.0
     # via -r requirements.in
 whitenoise==6.7.0
     # via -r requirements.in
