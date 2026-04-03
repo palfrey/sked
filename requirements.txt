@@ -122,7 +122,7 @@ typing-extensions==4.12.2
     #   django-stubs
     #   django-stubs-ext
     #   mypy
-tzdata==2025.3
+tzdata==2026.1
     # via icalendar
 uritemplate==4.1.1
     # via google-api-python-client
