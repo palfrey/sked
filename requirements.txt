@@ -47,7 +47,7 @@ googleapis-common-protos==1.65.0
     # via google-api-core
 gunicorn==26.0.0
     # via -r requirements.in
-httplib2==0.22.0
+httplib2==0.32.0
     # via
     #   google-api-python-client
     #   google-auth-httplib2
