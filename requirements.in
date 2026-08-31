@@ -18,3 +18,4 @@ django-stubs
 mypy
 types-python-dateutil
 types-requests
+pytest-playwright

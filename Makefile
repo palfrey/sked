@@ -7,6 +7,7 @@ requirements.txt: requirements.in constraints.txt
 .PHONY: sync
 sync: requirements.txt .venv/bin/activate
 	uv pip sync requirements.txt
+	uv run playwright install chromium-headless-shell
 
 .PHONY: pre-commit
 pre-commit: sync
