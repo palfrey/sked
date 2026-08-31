@@ -2,6 +2,8 @@
 #    uv pip compile --python-version 3.12.2 --no-strip-extras requirements.in -o requirements.txt --constraint constraints.txt
 asgiref==3.8.1
     # via django
+ast-serialize==0.8.0
+    # via mypy
 certifi==2026.1.4
     # via requests
 cfgv==3.4.0
@@ -43,6 +45,8 @@ google-auth-oauthlib==1.2.1
     # via -r requirements.in
 googleapis-common-protos==1.65.0
     # via google-api-core
+greenlet==3.5.5
+    # via playwright
 gunicorn==26.0.0
     # via -r requirements.in
 httplib2==0.32.0
@@ -55,20 +59,32 @@ identify==2.6.1
     # via pre-commit
 idna==3.15
     # via requests
+iniconfig==2.3.0
+    # via pytest
 iso8601==2.1.0
     # via -r requirements.in
-mypy==1.11.2
+librt==0.15.0
+    # via mypy
+mypy==2.3.1
     # via -r requirements.in
-mypy-extensions==1.0.0
+mypy-extensions==1.1.0
     # via mypy
 nodeenv==1.9.1
     # via pre-commit
 oauthlib==3.2.2
     # via requests-oauthlib
 packaging==26.0
-    # via gunicorn
+    # via
+    #   gunicorn
+    #   pytest
+pathspec==1.1.1
+    # via mypy
 platformdirs==4.3.6
     # via virtualenv
+playwright==1.62.0
+    # via pytest-playwright
+pluggy==1.6.0
+    # via pytest
 pre-commit==4.5.1
     # via -r requirements.in
 proto-plus==1.24.0
@@ -86,12 +102,26 @@ pyasn1==0.6.4
     #   rsa
 pyasn1-modules==0.4.1
     # via google-auth
+pyee==13.0.1
+    # via playwright
+pygments==2.21.0
+    # via pytest
 pyparsing==3.1.4
     # via httplib2
+pytest==9.1.1
+    # via
+    #   pytest-base-url
+    #   pytest-playwright
+pytest-base-url==2.1.0
+    # via pytest-playwright
+pytest-playwright==0.9.0
+    # via -r requirements.in
 python-dateutil==2.9.0.post0
     # via
     #   -r requirements.in
     #   icalendar
+python-slugify==8.0.4
+    # via pytest-playwright
 pyyaml==6.0.2
     # via
     #   pre-commit
@@ -100,6 +130,7 @@ requests==2.33.0
     # via
     #   -r requirements.in
     #   google-api-core
+    #   pytest-base-url
     #   requests-oauthlib
 requests-oauthlib==2.0.0
     # via google-auth-oauthlib
@@ -109,6 +140,8 @@ six==1.16.0
     # via python-dateutil
 sqlparse==0.6.0
     # via django
+text-unidecode==1.3
+    # via python-slugify
 types-python-dateutil==2.9.0.20240906
     # via -r requirements.in
 types-pyyaml==6.0.12.20240917
@@ -120,6 +153,7 @@ typing-extensions==4.12.2
     #   django-stubs
     #   django-stubs-ext
     #   mypy
+    #   pyee
 tzdata==2026.1
     # via icalendar
 uritemplate==4.1.1

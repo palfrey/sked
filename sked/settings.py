@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 """
 
 import os
+from typing import TYPE_CHECKING
 
 import dj_database_url
 
@@ -140,8 +141,12 @@ STATIC_URL = "/static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
 STATICFILES_DIRS = [os.path.join(BASE_DIR, "calendars", "static")]
 
-GOOGLE_OAUTH2_KEY = os.environ["GOOGLE_OAUTH2_KEY"]
-GOOGLE_OAUTH2_SECRET = os.environ["GOOGLE_OAUTH2_SECRET"]
+if TYPE_CHECKING:
+    GOOGLE_OAUTH2_KEY = "demo-key"
+    GOOGLE_OAUTH2_SECRET = "demo-secret"
+else:
+    GOOGLE_OAUTH2_KEY = os.environ["GOOGLE_OAUTH2_KEY"]
+    GOOGLE_OAUTH2_SECRET = os.environ["GOOGLE_OAUTH2_SECRET"]
 
 LOGGING = {
     "version": 1,
