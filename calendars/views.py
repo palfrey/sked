@@ -620,10 +620,13 @@ def merged_calendar_view(request: HttpRequest, id: uuid.UUID) -> HttpResponse:
 
 
 def make_datetime(date: datetime.datetime | datetime.date) -> datetime.datetime:
+    tz = dateutil.tz.gettz("Europe/London")
     if isinstance(date, datetime.datetime):
-        return date
+        if date.tzinfo is None:
+            return date.replace(tzinfo=tz)
+        else:
+            return date
     elif isinstance(date, datetime.date):
-        tz = dateutil.tz.gettz("Europe/London")
         return datetime.datetime.combine(date, datetime.time.min, tz)
     else:
         raise Exception("Can't convert", date)
