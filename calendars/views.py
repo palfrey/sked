@@ -498,18 +498,22 @@ def add_gcalendar(
         items = []
         pageToken = None
         while True:
-            eventsResult = (
-                calendar_service.events()
-                .list(
-                    calendarId=id,
-                    timeMin=minTime,
-                    timeMax=maxTime,
-                    singleEvents=True,
-                    maxResults=2500,
-                    pageToken=pageToken,
+            try:
+                eventsResult = (
+                    calendar_service.events()
+                    .list(
+                        calendarId=id,
+                        timeMin=minTime,
+                        timeMax=maxTime,
+                        singleEvents=True,
+                        maxResults=2500,
+                        pageToken=pageToken,
+                    )
+                    .execute()
                 )
-                .execute()
-            )
+            except Exception as e:
+                print("failure getting Gcal " + id, e)
+                break
             items += eventsResult["items"]
             if "nextPageToken" not in eventsResult:
                 break
