@@ -524,7 +524,7 @@ def add_gcalendar(
             pageToken = eventsResult["nextPageToken"]
         cache.set(id, items)
     for item in items:
-        if item["status"] == "cancelled":
+        if item["status"] == "cancelled" or item["eventType"] == "workingLocation":
             continue
         event = icalendar.Event()
         try:
