@@ -556,7 +556,7 @@ def add_icalendar(
     if ical is None:
         data = requests.get(url)
         if not data.ok:
-            data.raise_for_status()
+            print("Failure to get ical", url, data.status_code, data.text)
             return
         ical = data.text
         cache.set(url, ical)
