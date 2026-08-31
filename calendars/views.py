@@ -453,7 +453,11 @@ def my_calendar_json(request: HttpRequest, user: GoogleUser) -> JsonResponse:
 
 def date_convert(when: dict) -> icalendar.vDate | icalendar.vDatetime:
     if "dateTime" in when:
-        return icalendar.vDatetime(iso8601.parse_date(when["dateTime"]))
+        dt = iso8601.parse_date(when["dateTime"])
+        if dt.hour == 0 and dt.minute == 0:
+            return icalendar.vDate(dt)
+        else:
+            return icalendar.vDatetime(dt)
     elif "date" in when:
         return icalendar.vDate(iso8601.parse_date(when["date"]))
     else:
