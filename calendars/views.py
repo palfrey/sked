@@ -524,8 +524,18 @@ def add_gcalendar(
             pageToken = eventsResult["nextPageToken"]
         cache.set(id, items)
     for item in items:
-        if item["status"] == "cancelled" or item["eventType"] == "workingLocation":
+        notAttending = False
+        for attendee in item.get("attendees", []):
+            if attendee.get("self", False) and attendee["responseStatus"] == "declined":
+                notAttending = True
+
+        if (
+            notAttending
+            or item["status"] == "cancelled"
+            or item["eventType"] == "workingLocation"
+        ):
             continue
+
         event = icalendar.Event()
         try:
             if "summary" in item:
