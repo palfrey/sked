@@ -162,7 +162,7 @@ urllib3==2.8.0
     # via
     #   requests
     #   types-requests
-virtualenv==20.36.1
+virtualenv==21.7.13
     # via pre-commit
 watchdog[watchmedo]==2.1.7
     # via -r requirements.in
