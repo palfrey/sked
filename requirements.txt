@@ -4,7 +4,7 @@ asgiref==3.8.1
     # via django
 ast-serialize==0.8.0
     # via mypy
-certifi==2026.1.4
+certifi==2026.10.19
     # via requests
 cfgv==3.4.0
     # via pre-commit
