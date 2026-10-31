@@ -24,7 +24,7 @@ django-stubs==6.0.0
     # via -r requirements.in
 django-stubs-ext==6.0.0
     # via django-stubs
-filelock==3.20.3
+filelock==4.2.1
     # via virtualenv
 google-api-core==2.20.0
     # via google-api-python-client
